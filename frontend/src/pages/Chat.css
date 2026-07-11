@@ -1,0 +1,769 @@
+:root {
+  --indigo-primary: #4f46e5;
+  --slate-received: #1e293b;
+  --bg-dark: #0f172a;
+  --text-white: #f8fafc;
+}
+
+.chat-app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  position: relative; 
+  background-color: var(--bg-dark);
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #1e293b;
+  color: var(--text-white);
+  height: 60px;
+  border-bottom: 1px solid #334155;
+}
+
+.back-btn { background: none; border: none; color: #fff; cursor: pointer; margin-right: 15px; }
+.user-info h3 { margin: 0; font-size: 1.1rem; }
+.user-info .status { font-size: 0.8rem; color: #94a3b8; }
+
+.messages-window {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  padding-bottom: 90px; 
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: var(--bg-dark);
+  background-image: radial-gradient(#334155 0.5px, transparent 0.5px);
+  background-size: 20px 20px;
+}
+
+.message-wrapper { display: flex; width: 100%; }
+.sent-wrapper { justify-content: flex-end; }
+.received-wrapper { justify-content: flex-start; }
+
+
+.sent {
+  background-color: var(--indigo-primary);
+  border-bottom-right-radius: 2px;
+}
+
+.received {
+  background-color: var(--slate-received);
+  border-bottom-left-radius: 2px;
+}
+
+.input-area {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center; 
+  gap: 10px;
+  background: #1e293b; 
+  border-radius: 29px;
+  padding: 5px 15px;    
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.input-area input {
+  flex: 1;
+  background: transparent; 
+  border: none;
+  padding: 12px;
+  color: white;
+  outline: none;
+}
+
+.send-btn {
+  background-color: var(--indigo-primary);
+  color: white;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  margin-right: -8px;
+}
+
+.send-btn:hover {
+  background-color: #4338ca;
+}
+
+.date-divider {
+  text-align: center;
+  margin: 15px 0;
+}
+
+.date-divider span {
+  background-color: #2a3942; 
+  color: #8696a0;
+  padding: 5px 12px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.message-wrapper {
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sent-wrapper { align-items: flex-end; }
+.received-wrapper { align-items: flex-start; }
+
+.msg-time {
+  font-size: 0.65rem !important; 
+  opacity: 0.7;               
+  margin-top: 4px;            
+  display: block;             
+  text-align: right;          
+}
+
+.msg-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.status-icon {
+  display: flex;
+  align-items: center;
+}
+
+.context-menu {
+  position: fixed;
+  background: #1f2937;
+  color: white;
+  border-radius: 8px;
+  padding: 5px 0;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  min-width: 100px;
+}
+
+.context-menu button {
+  width: 100%;
+  padding: 10px 15px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.context-menu button:hover {
+  background-color: #374151;
+}
+
+.messages-container {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 8px; 
+}
+
+/* .message-bubble {
+  padding: 8px;
+  border-radius: 10px;
+  position: relative;
+  max-width: 300px; 
+} */
+
+/* Base bubble shared styles */
+
+/* Sent messages */
+.message-bubble.sent {
+  background-color: #6366f1; 
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 2px;
+}
+
+/* Received messages */
+.message-bubble.received {
+  background-color: #374151; 
+  color: white;
+  align-self: flex-start;
+  border-bottom-left-radius: 2px;
+}
+
+.plus-btn {
+  background: none;
+  border: none;
+  color: #8696a0;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.plus-btn:hover {
+  color: #ffffff; 
+  transform: rotate(90deg); 
+}
+
+.file-menu {
+  position: absolute;
+  bottom: 60px; 
+  left: 10px;
+  background-color: #2a3942;
+  border-radius: 10px;
+  padding: 10px;
+  width: 200px;
+  z-index: 9999;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+.file-menu label {
+  color: #e9edef;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.file-menu label:hover {
+  background-color: #3b4a54;
+  border-radius: 5px;
+}
+
+.chat-image {
+  max-width: 100%;
+  width: 100%;
+  height: auto; 
+  border-radius: 8px;
+  cursor: pointer;
+  display: block;
+}
+
+.lightbox {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.lightbox-controls {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.lightbox-btn {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 10px;
+  border-radius: 50%; 
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s;
+}
+
+.lightbox-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 600px) {
+  .chat-app-container {
+    width: 100vw;
+    height: 100vh;
+  }
+  
+  .message-bubble {
+    max-width: 85%; 
+  }
+}
+
+.file-attachment {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 5px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 5px;
+}
+
+.chat-media {
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  display: block;
+}
+
+.file-attachment {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  cursor: pointer;
+  color: #e9edef;
+}
+
+.file-info {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+}
+
+.chat-video {
+  max-width: 100%;
+  width: 100%;
+  border-radius: 8px;
+  display: block;
+}
+
+.file-doc {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+}
+
+.file-name {
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lightbox-media {
+  max-width: 90%;
+  max-height: 80vh;
+  object-fit: contain;
+}
+
+.lightbox-file-placeholder {
+  color: white;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.file-doc {
+  transition: background 0.2s;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.file-doc:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.mic-btn.recording {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.mic-btn {
+  background: none;
+  border: none;
+  color: #8696a0;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  margin-left: -7px;
+}
+
+.mic-btn:hover {
+  color: #ffffff;
+}
+
+.mic-btn.recording {
+  color: #ff4d4d;
+  animation: pulse-animation 1.5s infinite;
+}
+
+.mic-btn, .plus-btn {
+  flex-shrink: 0; 
+}
+
+@keyframes pulse-animation {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* .message-bubble {
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  border-radius: 10px;
+  max-width: 250px;
+} */
+
+.message-bubble.sent {
+  align-self: flex-end;
+  background-color: #5b6af0;
+}
+
+.message-bubble .timestamp {
+  font-size: 10px;
+  margin-top: 4px;
+  align-self: flex-end;
+  opacity: 0.8;
+}
+
+.vn-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 220px; 
+  height: 25px;
+  background: transparent !important;
+}
+
+.vn-btn {
+  background-color: #3f51ef;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-top: 20px;
+  margin-left: 10px;
+}
+
+.vn-waveform {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 20px;
+  width: 130px;
+  margin-top: 20px;
+}
+
+.vn-bar {
+  width: 12px;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  transition: height 0.2s;
+}
+
+/* Ensure the video preview container fits the bubble */
+/* .video-preview { 
+  position: relative; 
+  width: 200px; 
+  height: 150px; 
+  background: #000; 
+  border-radius: 8px; 
+  overflow: hidden; 
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-preview video { 
+  width: 100%; 
+  height: 100%; 
+  object-fit: cover; 
+} */
+
+/* Container adapts to the video's natural dimensions */
+/* .video-preview { 
+  position: relative; 
+  max-width: 250px; 
+  min-width: 150px;
+  background: #000; 
+  border-radius: 8px; 
+  overflow: hidden; 
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+} */
+
+/* Remove object-fit: cover if you want the full frame, or keep it for a uniform look */
+.video-preview video { 
+  width: 100%; 
+  height: auto; 
+  display: block;
+}
+
+/* Play button stays centered over the dynamic size */
+.play-overlay { 
+  position: absolute; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  background: rgba(0,0,0,0.4); 
+  width: 40px; 
+  height: 40px; 
+  border-radius: 50%;
+}
+
+/* .video-preview { position: relative; width: 200px; height: 150px; background: #000; border-radius: 8px; overflow: hidden; cursor: pointer; } */
+/* .video-preview video { width: 100%; height: 100%; object-fit: cover; } */
+.play-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); }
+
+/* Fullscreen Styling */
+.fullscreen-overlay { 
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+  background: rgba(0,0,0,0.95); z-index: 9999; 
+  display: flex; align-items: center; justify-content: center; 
+}
+.fullscreen-content { max-width: 90vw; max-height: 90vh; border-radius: 4px; }
+.close-fullscreen, .download-fullscreen { 
+  position: absolute; top: 20px; color: white; background: none; border: none; cursor: pointer; 
+}
+.close-fullscreen { right: 20px; }
+.download-fullscreen { right: 70px; }
+
+/* Document Styling */
+.doc-preview { 
+  display: flex; align-items: center; gap: 10px; padding: 10px; 
+  background: #f0f0f0; border-radius: 8px; color: #333; cursor: pointer; 
+}
+
+.media-container { position: relative; min-width: 150px; min-height: 150px; }
+.media-loader { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #ddd; border-radius: 8px; }
+.animate-spin { animation: spin 1s linear infinite; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* Container for media within the bubble */
+.media-container { 
+  position: relative; 
+  max-width: 280px; /* Adjust as needed for your bubble size */
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+/* Ensure images maintain aspect ratio */
+.media-container img {
+  width: 100%;
+  height: auto; /* This is crucial: keeps original aspect ratio */
+  display: block;
+  object-fit: contain; /* Ensures the whole image is visible */
+}
+
+/* Ensure videos maintain aspect ratio */
+.video-preview video { 
+  width: 100%; 
+  height: auto; 
+  display: block;
+}
+
+/* 1. Reset standard bubble for text-only messages */
+/* 1. Base media bubble constraint */
+/* 1. Force a strict, consistent width for media bubbles on all devices */
+.media-bubble {
+  padding: 4px !important;
+  width: 250px !important; 
+  max-width: 250px !important;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0; /* Prevents the bubble from being squashed */
+}
+
+.text-content {
+  /* margin: 100px !important; */
+  margin-left: 100px !important;
+}
+
+.message-bubble {
+  padding: 8px 12px;
+  border-radius: 12px;
+  /* Allow the bubble to shrink to fit text, but cap the maximum width */
+  width: fit-content !important;
+  max-width: 70%; 
+  min-width: 60px; /* Ensures very short messages don't look like slivers */
+  margin: 4px 0;
+  word-wrap: break-word;
+}
+
+/* 2. Ensure images and video wrappers fit inside that 250px width */
+.msg-media-preview, 
+.video-preview, 
+.video-preview video {
+  width: 100% !important; /* Fills the 250px bubble exactly */
+  height: auto !important;
+  display: block !important;
+  border-radius: 6px;
+  object-fit: contain; /* Keeps the whole image visible */
+}
+
+/* 3. Ensure the video container matches the fixed width */
+.video-preview {
+  position: relative;
+  width: 100% !important;
+  background: #000;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+@media (max-width: 480px) {
+  .media-bubble {
+    width: 200px; /* Smaller width for mobile */
+  }
+}
+
+.input-container {
+  display: flex;
+  align-items: flex-end;
+  padding: 10px;
+  background: #202c33;
+}
+
+.message-input {
+  flex-grow: 1;
+  /* This ensures it starts small but grows */
+  min-height: 20px;
+  max-height: 150px; 
+  overflow-y: auto;
+  padding: 10px;
+  border-radius: 8px;
+  background: #2a3942;
+  color: white;
+  outline: none;
+  /* This ensures text wraps to new lines */
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+
+/* 1. The Expanding Input Area */
+.message-input-div {
+  flex: 1;
+  min-height: 24px;
+  max-height: 120px;
+  overflow-y: auto;
+  padding: 10px;
+  background: transparent;
+  color: white;
+  outline: none;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  line-height: 1.4;
+}
+
+.message-input-div:empty::before {
+  content: "Type a message...";
+  color: #8696a0;
+}
+
+/* 2. Message Bubble Responsiveness */
+.message-bubble {
+  width: fit-content !important; /* Force bubble to match text width */
+  max-width: 75%;                /* Stop it from hitting the edge */
+  min-width: 50px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+/* Ensure parents don't force width */
+.message-wrapper {
+  display: flex;
+  width: 100%;
+}
+
+.sent-wrapper { justify-content: flex-end; }
+.received-wrapper { justify-content: flex-start; }
+
+.date-divider {
+  display: flex;
+  justify-content: center;
+  margin: 15px 0;
+  width: 100%;
+}
+
+.date-divider span {
+  background-color: #1e293b; /* Matches your theme */
+  color: #94a3b8;
+  padding: 5px 12px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Container for the whole message row */
+.message-wrapper {
+  display: flex;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.sent-wrapper { justify-content: flex-end; }
+.received-wrapper { justify-content: flex-start; }
+
+/* The actual bubble */
+.message-bubble {
+  padding: 8px 12px;
+  border-radius: 12px;
+  max-width: 80%;
+  width: fit-content; /* Critical: makes bubble wrap around text */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin-left: 25px;
+  margin-right: 25px;
+}
+
+/* Specific Media override */
+.media-bubble {
+  width: 250px;       /* Fixed width for media */
+  padding: 4px;
+}
+
+/* Force text to wrap */
+.message-bubble p {
+  margin: 0;
+  word-wrap: break-word;
+}

@@ -1,0 +1,143 @@
+.sidebar-content {
+  background-color: #1e293b; 
+  color: #f8fafc;
+  height: 100vh;
+  border-right: 1px solid #334155;
+  padding: 20px;
+}
+
+.sidebar-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #fff;
+}
+.search-container {
+  display: flex;
+  align-items: center;
+  background-color: #334155; 
+  padding: 10px 15px;
+  border-radius: 25px; 
+  margin-bottom: 20px;
+  margin-top: -18px;
+}
+
+.search-icon { color: #94a3b8; margin-right: 12px; }
+
+.search-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: white;
+  width: 100%;
+}
+
+.chat-list { display: flex; flex-direction: column; }
+
+.chat-item {
+  padding: 15px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  border-bottom: 1px solid #2a3942;
+}
+
+.chat-item:hover {
+  background-color: #2d3748;
+}
+
+.chat-item.active-chat {
+  background-color: #2d3748; 
+  border-left: 4px solid #4338ca;
+}
+
+.chat-info h4 { margin: 0; font-size: 16px; color: #fff; }
+.last-message { margin: 0; font-size: 13px; color: #8696a0; }
+
+.sidebar-logo {
+  width: 50px; 
+  height: 50px; 
+  object-fit: contain;
+  margin-bottom: 17px;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 10px; 
+  padding: 10px 5px;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; 
+  padding: 15px;
+  background: #1e293b; 
+}
+
+.header-logo-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar-logo {
+  width: 45px; 
+  height: 45px;
+  object-fit: contain;
+}
+
+.sidebar-title {
+  font-size: 16px;
+  line-height: 1.2;
+  margin-top: 5px;
+  color: white;
+}
+
+.logout-icon-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.logout-icon-btn:hover {
+  background: #334155;
+  color: #ef4444;
+}
+
+.text-muted.small {
+  color: #b3b3b3 !important; 
+  font-size: 0.75rem;
+}
+
+.chat-item .text-muted {
+  color: #e0e0e0 !important;
+}
+
+/* 1. Make the chat list scrollable */
+.chat-list {
+  flex: 1;             /* Takes up all remaining space */
+  overflow-y: auto;    /* Enables vertical scroll */
+  height: 100%;        /* Ensure it respects the parent height */
+}
+
+/* 2. Truncate the last message text */
+.last-message {
+  white-space: nowrap;      /* Keeps text on one line */
+  overflow: hidden;         /* Hides overflow */
+  text-overflow: ellipsis;  /* Adds the '...' */
+  max-width: 100%;          /* Ensures it stays within the bubble/info width */
+}
+
+/* Ensure the parent of .chat-list has a defined height/flex */
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Or your specific sidebar height */
+}
