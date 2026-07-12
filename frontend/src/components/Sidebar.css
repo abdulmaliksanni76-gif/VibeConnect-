@@ -104,6 +104,7 @@
   transition: all 0.2s;
   display: flex;
   align-items: center;
+  margin-top: -14px;
 }
 
 .logout-icon-btn:hover {
