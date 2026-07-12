@@ -8,7 +8,8 @@ import { formatTimestamp } from '../components/dateUtils';
 import { useParams } from 'react-router-dom';
 import { SocketContext } from '../context/SocketContext';
 
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const BASE_URL = import.meta.env.VITE_API_URL || "";
+// const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const Sidebar = () => {
   const [conversations, setConversations] = useState([]);
