@@ -752,8 +752,6 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  margin-left: 25px;
-  margin-right: 25px;
 }
 
 /* Specific Media override */
@@ -766,4 +764,17 @@
 .message-bubble p {
   margin: 0;
   word-wrap: break-word;
+}
+
+.chat-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+
+.chat-container {
+  padding-top: 70px; 
 }
