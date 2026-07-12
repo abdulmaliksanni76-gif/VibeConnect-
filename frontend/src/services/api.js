@@ -21,14 +21,15 @@
 
 import axios from 'axios';
 
-// If BASE_URL is empty (production), baseURL is just "/api"
-// If BASE_URL is "http://localhost:5000", baseURL is "http://localhost:5000/api"
 const API = axios.create({ 
+  // In production, this becomes https://your-domain.com/api
+  // In development, this becomes http://localhost:5000/api
   baseURL: import.meta.env.MODE === 'production' 
     ? "/api" 
     : "http://localhost:5000/api" 
 });
 
+// Since the baseURL already ends in /api, the endpoint here should just be /auth/register
 export const registerUser = (formData) => API.post('/auth/register', formData);
 
 export default API;
