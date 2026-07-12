@@ -754,18 +754,6 @@
   flex-direction: column;
 }
 
-/* Specific Media override */
-.media-bubble {
-  width: 250px;       /* Fixed width for media */
-  padding: 4px;
-}
-
-/* Force text to wrap */
-.message-bubble p {
-  margin: 0;
-  word-wrap: break-word;
-}
-
 .chat-header {
   position: fixed;
   top: 0;
@@ -774,7 +762,25 @@
   z-index: 1000;
 }
 
+/* .media-bubble {
+  width: 250px;     
+  padding: 4px;
+}
+
+.message-bubble p {
+  margin: 0;
+  word-wrap: break-word;
+}
+
+.chat-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
 
 .chat-app-container {
   padding-top: 70px; 
-}
+} */
