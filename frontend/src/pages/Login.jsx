@@ -2,12 +2,9 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { Mail, Lock } from 'lucide-react';
+import { useUser } from '../context/UserContext';
 
-// const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-// const BASE_URL = import.meta.env.MODE === 'production' 
-//   ? "https://vibeconnect-1-f4m7.onrender.com" 
-//   : "http://localhost:5000";
-// const BASE_URL = import.meta.env.VITE_API_URL || "";
+
 const BASE_URL = import.meta.env.VITE_API_URL || ""; 
 
 function Login() {
@@ -15,27 +12,30 @@ function Login() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { refreshUser } = useUser();
 
-//   const handleLogin = async (e) => {
+
+
+// const handleLogin = async (e) => {
 //     e.preventDefault();
 //     setIsSubmitting(true);
 //     setError(null);
-    
+
 //     try {
-//       const response = await axios.post('http://localhost:5000/api/auth/login', formData);
+//       // Use the BASE_URL here
+//       const response = await axios.post(`${BASE_URL}/api/auth/login`, formData);
 //       const { data } = response;
-      
+
 //       localStorage.setItem('token', data.token);
-//       localStorage.setItem('userId', data.userId); 
+//       localStorage.setItem('userId', data.userId);
 //       localStorage.setItem('username', data.username);
       
-//       navigate('/chat');
+//       navigate('/chat'); // Redirect to your chat page
 //     } catch (err) {
-//       setError(err.response?.data?.message || 'Invalid credentials');
-//     } finally {
-//       setIsSubmitting(false); 
+//       setError("Login failed. Please check your credentials.");
+//       setIsSubmitting(false);
 //     }
-// };
+//   };
 
 const handleLogin = async (e) => {
     e.preventDefault();
@@ -43,7 +43,6 @@ const handleLogin = async (e) => {
     setError(null);
 
     try {
-      // Use the BASE_URL here
       const response = await axios.post(`${BASE_URL}/api/auth/login`, formData);
       const { data } = response;
 
@@ -51,7 +50,10 @@ const handleLogin = async (e) => {
       localStorage.setItem('userId', data.userId);
       localStorage.setItem('username', data.username);
       
-      navigate('/chat'); // Redirect to your chat page
+      // TRIGGER THE REFRESH HERE
+      await refreshUser(); 
+      
+      navigate('/chat');
     } catch (err) {
       setError("Login failed. Please check your credentials.");
       setIsSubmitting(false);

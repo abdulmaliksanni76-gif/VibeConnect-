@@ -612,9 +612,9 @@ const Chat = () => {
   const userId = localStorage.getItem("userId");
   const recipient = chatData?.participants?.find(p => p._id !== userId);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  // useEffect(() => {
+  //   messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  // }, [messages]);
 
   useEffect(() => {
     if (editingMessageId) {

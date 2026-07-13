@@ -125,7 +125,7 @@
 .chat-list {
   flex: 1;             /* Takes up all remaining space */
   overflow-y: auto;    /* Enables vertical scroll */
-  height: 100%;        /* Ensure it respects the parent height */
+  /* height: 100%;         */
 }
 
 /* 2. Truncate the last message text */
@@ -141,4 +141,135 @@
   display: flex;
   flex-direction: column;
   height: 100vh; /* Or your specific sidebar height */
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Ensure it takes full height */
+  overflow: hidden;
+  width: 100%;
+}
+
+.chat-list {
+  flex-grow: 1; /* Takes all available middle space */
+  overflow-y: auto; /* Scrollable list */
+}
+
+/* .bottom-nav {
+  display: flex;
+  justify-content: space-around;
+  padding: 15px 10px;
+  background-color: #111b21; 
+  border-top: 1px solid #202c33;
+} */
+
+.bottom-nav button {
+  background: none;
+  border: none;
+  color: #8696a0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-size: 10px;
+}
+
+.bottom-nav button:hover { color: #53bdeb; }
+
+
+.bottom-nav {
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 10px;
+  
+  /* Glassmorphism Styles */
+  background: rgba(255, 255, 255, 0.03); /* Extremely low opacity white */
+  backdrop-filter: blur(15px);           /* The blur effect */
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle light border */
+  
+  border-radius: 16px;
+  margin: 10px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); /* Deeper shadow for depth */
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  color: #8696a0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+/* Hover and Active States */
+.nav-btn:hover {
+  color: #53bdeb;
+}
+
+.nav-btn.active {
+  background-color: rgba(83, 187, 235, 0.15); /* Semi-transparent blue active state */
+  color: #53bdeb;
+}
+
+.nav-btn span {
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.chat-item-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0; /* Ensures the avatar doesn't get squashed */
+}
+
+.chat-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  gap: 15px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.chat-item:hover {
+  background-color: #2a3942;
+}
+
+.chat-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.chat-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* Makes it take up all remaining width */
+  overflow: hidden; /* Prevents text from breaking layout */
+}
+
+.chat-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.chat-timestamp {
+  font-size: 0.75rem;
+  color: #8696a0;
+  white-space: nowrap; /* Prevents time from wrapping */
+  margin-left: 8px;
 }

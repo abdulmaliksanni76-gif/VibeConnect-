@@ -54,20 +54,92 @@ exports.login = async (req, res) => {
     }
 };
 
+// exports.verifyOtp = async (req, res) => {
+//     try {
+//         const { email, otp } = req.body;
+//         const user = await User.findOne({ email });
+
+//         if (!user || user.otp !== otp || user.otpExpires < Date.now()) {
+//             return res.status(400).json({ message: 'Invalid or expired OTP' });
+//         }
+
+//         user.isVerified = true;
+//         user.otp = undefined;
+//         await user.save();
+//         return res.json({ message: 'Email verified successfully!' });
+//     } catch (error) {
+//         return res.status(500).json({ error: error.message });
+//     }
+// };
+
+// exports.verifyOtp = async (req, res) => {
+//     try {
+//         const { email, otp } = req.body;
+//         const user = await User.findOne({ email });
+
+//         if (!user || user.otp !== otp || user.otpExpires < Date.now()) {
+//             return res.status(400).json({ message: 'Invalid or expired OTP' });
+//         }
+
+//         user.isVerified = true;
+//         user.otp = undefined;
+//         await user.save();
+
+//         // Generate token upon successful verification
+//         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+//         return res.json({ 
+//             message: 'Email verified successfully!',
+//             token, 
+//             userId: user._id 
+//         });
+//     } catch (error) {
+//         return res.status(500).json({ error: error.message });
+//     }
+// };
+
+// Inside authController.js
+// exports.verifyOtp = async (req, res) => {
+//     // ... verification logic ...
+//     user.isVerified = true;
+//     await user.save();
+
+//     // Create the token immediately after verification
+//     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+//     return res.json({ 
+//         message: 'Email verified successfully!', 
+//         token, 
+//         userId: user._id 
+//     });
+// };
+
 exports.verifyOtp = async (req, res) => {
     try {
         const { email, otp } = req.body;
         const user = await User.findOne({ email });
 
-        if (!user || user.otp !== otp || user.otpExpires < Date.now()) {
+        // 1. Better validation
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        if (user.otp !== otp || user.otpExpires < Date.now()) {
             return res.status(400).json({ message: 'Invalid or expired OTP' });
         }
 
         user.isVerified = true;
         user.otp = undefined;
         await user.save();
-        return res.json({ message: 'Email verified successfully!' });
+
+        // 2. Safety check for your environment variable
+        if (!process.env.JWT_SECRET) {
+            console.error("CRITICAL: JWT_SECRET is not defined in .env");
+            return res.status(500).json({ message: "Server configuration error" });
+        }
+
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+        return res.json({ message: 'Verified!', token, userId: user._id });
     } catch (error) {
+        console.error("Verify OTP Error:", error); // This will show in your terminal
         return res.status(500).json({ error: error.message });
     }
 };
@@ -89,3 +161,4 @@ exports.resendOtp = async (req, res) => {
         return res.status(500).json({ error: error.message });
     }
 };
+

@@ -11,7 +11,7 @@
   flex-direction: column;
   height: 100vh;   
   overflow: hidden;  
-  position: relative;
+  /* position: relative; */
 }
 
 .sidebar-container {
@@ -37,6 +37,7 @@
 @media (max-width: 768px) {
   .sidebar-container { width: 100%; }
   .hide-mobile { display: none !important; }
+  
   .chat-window-container {
     position: absolute;
     top: 0;
@@ -44,6 +45,7 @@
     width: 100%;
     height: 100%;
     z-index: 10;
+    /* background: #0b141a; */
   }
 }
 
@@ -51,4 +53,38 @@
 .chat-logo {
   width: 100px;
   margin-bottom: 20px;
+}
+
+.empty-chat-placeholder {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+/* @media (max-width: 768px) {
+  .chat-window-container.hide-mobile {
+     display: none;
+  }
+} */
+
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+  
+  .chat-window-container {
+    width: 100%;
+  }
+}
+
+/* Add this to ChatLayout.css to ensure the Outlet takes full space */
+.chat-window-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto; /* Allows scrolling if content is long */
 }

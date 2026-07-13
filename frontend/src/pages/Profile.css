@@ -1,0 +1,129 @@
+/* .profile-container { padding: 25px; color: #e9edef; max-width: 500px; } */
+
+.profile-header { display: flex; align-items: center; gap: 20px; margin-bottom: 30px; }
+.back-btn { background: none; border: none; color: #8696a0; cursor: pointer; display: flex; }
+.back-btn:hover { color: #53bdeb; }
+
+.avatar-section { display: flex; flex-direction: column; align-items: center; margin-bottom: 30px; }
+.avatar-placeholder { width: 140px; height: 140px; background: #202c33; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin-bottom: 15px; }
+
+.change-photo-btn { background: none; border: 1px solid #53bdeb; color: #53bdeb; padding: 8px 16px; border-radius: 20px; cursor: pointer; }
+
+/* .profile-info { display: flex; flex-direction: column; gap: 10px; margin-bottom: 30px; } */
+.profile-info label { font-size: 13px; color: #53bdeb; padding-left: 5px; align-items: stretch; }
+.profile-info input { padding: 12px; border-radius: 8px; border: 1px solid #313d46; background: #111b21; color: white; outline: none; }
+
+/* .save-btn { background: #53bdeb; color: #111b21; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; } */
+.save-btn:hover { background: #3faad9; }
+
+/* Container centered in the right-hand panel */
+.profile-container { 
+  /* padding: 40px;  */
+  /* color: #e9edef;  */
+  /* display: flex;  */
+  flex-direction: column; 
+  align-items: center; 
+  width: 100%;
+  padding: 40px;
+  color: #e9edef;
+  display: flex;
+  justify-content: center; 
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* Wrapper to constrain width on large screens */
+.profile-content-wrapper {
+  width: 100%;
+  max-width: 500px; /* Prevents stretching too wide */
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+}
+
+/* Ensure the header is left-aligned with the wrapper content */
+.profile-header { 
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.profile-info { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 10px; 
+  margin-bottom: 30px; 
+  width: 100%;
+  max-width: 500px;
+}
+
+.save-btn { 
+  width: 100%; 
+  max-width: 500px;
+  background: #53bdeb; 
+  color: #111b21; 
+  border: none; 
+  padding: 12px; 
+  border-radius: 8px; 
+  cursor: pointer; 
+  font-weight: bold; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  gap: 8px; 
+}
+
+@media (max-width: 768px) {
+  .profile-container { padding: 60px; }
+  
+}
+
+/* Add this mobile override to your existing Profile.css */
+@media (max-width: 768px) {
+  .profile-container {
+    /* Align to the top instead of the center */
+    justify-content: flex-start; 
+    align-items: flex-start;
+    padding-top: 20px; /* Optional: adjust top spacing */
+  }
+
+  .profile-content-wrapper {
+    /* Ensure content flows from the top */
+    margin-top: 0; 
+  }
+}
+
+
+.loader-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  color: white;
+  gap: 10px;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Optional: dim buttons while loading */
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
