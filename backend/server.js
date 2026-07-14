@@ -36,8 +36,13 @@ io.on("connection", (socket) => {
     io.emit("get_online_users", Array.from(onlineUsers.keys()));
   });
 
+  // socket.on("join_chat", (conversationId) => {
+  //   socket.join(conversationId);
+  // });
+
   socket.on("join_chat", (conversationId) => {
     socket.join(conversationId);
+    console.log(`User joined room: ${conversationId}`);
   });
 
 //   socket.on("send_message", async (data) => {

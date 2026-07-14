@@ -353,14 +353,19 @@ useEffect(() => {
   const stopRecording = () => { mediaRecorderRef.current?.stop(); setIsRecording(false); };
 
   const handleInputChange = (e) => {
-    setNewMessage(e.target.value);
+  setInput(e.target.value); // Use your actual input state name (you defined it as 'input')
 
-    // Emit "typing" event
-    socket.emit("typing", {
-      chatId: currentChatId,
-      senderId: userId
-    });
-  };
+  socket.emit("typing", {
+    conversationId: conversationId, // Use the correct variable name here
+    senderId: userId
+  });
+};
+
+  useEffect(() => {
+  if (conversationId) { // Changed from currentChatId to conversationId
+    socket.emit("join_chat", conversationId);
+  }
+}, [conversationId, socket]); // Include socket in dependency array
 
 //   const activeReply = useMemo(() => {
 //   if (!replyingTo) return null;
