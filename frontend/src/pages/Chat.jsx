@@ -352,6 +352,16 @@ useEffect(() => {
 
   const stopRecording = () => { mediaRecorderRef.current?.stop(); setIsRecording(false); };
 
+  const handleInputChange = (e) => {
+    setNewMessage(e.target.value);
+
+    // Emit "typing" event
+    socket.emit("typing", {
+      chatId: currentChatId,
+      senderId: userId
+    });
+  };
+
 //   const activeReply = useMemo(() => {
 //   if (!replyingTo) return null;
 //   // This will automatically update whenever the messages array changes (e.g., after an edit)
