@@ -6,7 +6,13 @@ const messageSchema = new mongoose.Schema({
   text: String,
   fileUrl: String,   // New field
   fileType: String,  // e.g., 'image', 'pdf'
-  status: { type: String, default: 'sent' }
+  fileName: String,
+  status: { type: String, default: 'sent' },
+  replyTo: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Message',
+    default: null
+  }
 }, { timestamps: true });
 
 

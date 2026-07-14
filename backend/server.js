@@ -40,7 +40,35 @@ io.on("connection", (socket) => {
     socket.join(conversationId);
   });
 
-  socket.on("send_message", async (data) => {
+//   socket.on("send_message", async (data) => {
+//   try {
+//     const newMessage = new Message({ 
+//         conversationId: data.conversationId,
+//         sender: data.senderId, 
+//         text: data.text || "", 
+//         fileUrl: data.fileUrl,
+//         fileType: data.fileType || 'text', 
+//         status: 'sent' 
+//     });
+//     await newMessage.save();
+    
+//     let previewText = data.text;
+//     if (data.fileType === 'audio') previewText = "Voice note";
+//     else if (data.fileType === 'image') previewText = "Image";
+//     else if (data.fileUrl) previewText = "File"; 
+    
+//     await Conversation.findByIdAndUpdate(data.conversationId, {
+//         lastMessage: previewText,
+//         updatedAt: new Date()
+//     });
+    
+//     const populatedMessage = await Message.findById(newMessage._id).populate('sender', 'username'); 
+//     io.to(data.conversationId).emit("receive_message", populatedMessage);
+//     io.emit("refresh_sidebar");
+//   } catch (err) { console.error("Send Error:", err); }
+// });
+
+socket.on("send_message", async (data) => {
   try {
     const newMessage = new Message({ 
         conversationId: data.conversationId,
@@ -48,7 +76,8 @@ io.on("connection", (socket) => {
         text: data.text || "", 
         fileUrl: data.fileUrl,
         fileType: data.fileType || 'text', 
-        status: 'sent' 
+        status: 'sent',
+        replyTo: data.replyTo || null // Add this line
     });
     await newMessage.save();
     
@@ -62,11 +91,26 @@ io.on("connection", (socket) => {
         updatedAt: new Date()
     });
     
-    const populatedMessage = await Message.findById(newMessage._id).populate('sender', 'username'); 
+    // Update the populate to include the replied-to message if needed
+    const populatedMessage = await Message.findById(newMessage._id)
+      .populate('sender', 'username')
+      .populate('replyTo', 'text fileType'); // Populates basic info of the replied message
+      
     io.to(data.conversationId).emit("receive_message", populatedMessage);
     io.emit("refresh_sidebar");
   } catch (err) { console.error("Send Error:", err); }
 });
+
+  // Typing logic
+  socket.on("typing", (data) => {
+    // Emit to everyone in the room except the sender
+    socket.to(data.conversationId).emit("typing", { senderId: data.senderId });
+  });
+
+  socket.on("stop_typing", (data) => {
+    // Emit to everyone in the room except the sender
+    socket.to(data.conversationId).emit("stop_typing", { senderId: data.senderId });
+  });
 
   socket.on("mark_delivered", async ({ messageId, senderId }) => {
     try {

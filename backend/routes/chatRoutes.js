@@ -183,6 +183,10 @@ router.get('/messages/:chatId', auth, async (req, res) => {
   try {
     const messages = await Message.find({ conversationId: req.params.chatId })
       .populate('sender', 'username')
+      .populate({
+        path: 'replyTo',
+        populate: { path: 'sender', select: 'username' } // Populates sender of the original message
+      })
       .sort({ createdAt: 1 });
     res.json(messages);
   } catch (err) {
@@ -193,14 +197,17 @@ router.get('/messages/:chatId', auth, async (req, res) => {
 // Send message
 router.post('/send', auth, async (req, res) => {
     const { conversationId, text, fileUrl, fileType } = req.body;
-    const newMessage = new Message({ 
-        conversationId, 
-        sender: req.user.id, 
-        text: text || "", 
-        fileUrl, 
-        fileType 
+
+    const newMessage = new Message({
+        conversationId,
+        sender: req.user.id,
+        text: req.body.text,
+        fileUrl: req.body.fileUrl,
+        fileType: req.body.fileType,
+        // Add this line to capture the field!
+        fileName: req.body.fileName 
     });
-    await newMessage.save();
+await newMessage.save();
 
     const previewText = fileType === 'audio' ? "Voice note" : 
                         fileType === 'image' ? "Image" : 

@@ -273,3 +273,22 @@
   white-space: nowrap; /* Prevents time from wrapping */
   margin-left: 8px;
 }
+
+.vn-waveform { display: flex; align-items: center; gap: 2px; }
+.vn-bar { width: 3px; height: 10px; background: #ccc; border-radius: 2px; }
+
+/* Animation triggers only when 'playing' class is added */
+.vn-waveform.playing .vn-bar {
+  animation: wave-move 0.8s infinite alternate;
+}
+
+/* Stagger animation for wave effect */
+.vn-waveform.playing .vn-bar:nth-child(odd) { animation-delay: 0.1s; }
+.vn-waveform.playing .vn-bar:nth-child(even) { animation-delay: 0.3s; }
+
+@keyframes wave-move {
+  from { height: 10px; }
+  to { height: 25px; background: #ffffff; }
+}
+
+.vn-time { font-size: 10px; margin-left: 8px; color: #fff; }

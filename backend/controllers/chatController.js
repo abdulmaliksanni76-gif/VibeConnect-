@@ -1,20 +1,6 @@
 const Conversation = require('../models/Conversation');
 const { upload } = require('../config/cloudinary');
 
-// Existing function
-// exports.getUserConversations = async (req, res) => {
-//     try {
-//         const conversations = await Conversation.find({ 
-//             participants: req.user.id 
-//         })
-//         .populate('participants', 'username profilePic') // Ensure you populate profilePic!
-//         .sort({ updatedAt: -1 });
-        
-//         res.json(conversations);
-//     } catch (error) {
-//         res.status(500).json({ message: error.message });
-//     }
-// };
 
 exports.getUserConversations = async (req, res) => {
     try {
