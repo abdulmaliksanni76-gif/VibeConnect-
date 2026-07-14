@@ -362,10 +362,10 @@ useEffect(() => {
 };
 
   useEffect(() => {
-  if (conversationId) { // Changed from currentChatId to conversationId
-    socket.emit("join_chat", conversationId);
-  }
-}, [conversationId, socket]); // Include socket in dependency array
+    if (conversationId) { // Changed from currentChatId to conversationId
+      socket.emit("join_chat", conversationId);
+    }
+  }, [conversationId, socket]); // Include socket in dependency array
 
 //   const activeReply = useMemo(() => {
 //   if (!replyingTo) return null;
@@ -378,6 +378,23 @@ const activeReply = useMemo(() => {
   // This fetches the latest version of the message from your current state
   return messages.find(m => m._id === replyingTo._id) || replyingTo;
 }, [replyingTo, messages]);
+
+useEffect(() => {
+  socket.on("typing", (data) => {
+    if (data.senderId !== userId) {
+      setIsRecipientTyping(true); // Assuming this is your state for the typing indicator
+    }
+  });
+
+  socket.on("stop_typing", (data) => {
+    setIsRecipientTyping(false);
+  });
+
+  return () => {
+    socket.off("typing");
+    socket.off("stop_typing");
+  };
+}, [socket, userId]);
 
 const handleContextMenu = (e, messageId) => {
   e.preventDefault();
