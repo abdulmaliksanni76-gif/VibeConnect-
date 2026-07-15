@@ -1010,6 +1010,13 @@
   height: 42px;
 }
 
+@media (max-width: 600px) {
+  .media-preview-modal input {
+    width: 80%; /* Adjust this percentage to your preference */
+    max-width: 300px; /* Ensures it doesn't get too wide on larger phones */
+  }
+}
+
 .reply-bar {
   display: flex;
   justify-content: space-between;
