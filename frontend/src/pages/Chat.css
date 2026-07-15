@@ -1002,6 +1002,21 @@
   text-overflow: ellipsis;
 }
 
+@media (max-width: 600px) {
+  .reply-preview {
+    padding: 4px 8px;
+  }
+  
+  .reply-text-preview {
+    font-size: 0.75rem; /* Slightly smaller text for mobile */
+  }
+
+  .reply-bar span {
+    font-size: 0.7rem;
+  }
+}
+
+
 /* Styled X button */
 .reply-close-btn {
   background: rgba(255, 255, 255, 0.1);
