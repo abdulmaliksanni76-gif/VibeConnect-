@@ -600,15 +600,6 @@ useEffect(() => {
       
 
       <div className="input-area">
-        <button className="plus-btn" onClick={(e) => { e.stopPropagation(); setShowFileMenu(!showFileMenu); }}><Plus /></button>
-        <button className={`mic-btn ${isRecording ? 'recording' : ''}`} onClick={isRecording ? stopRecording : startRecording}>{isRecording ? <X /> : <Mic />}</button>
-        {showFileMenu && (
-          <div className="file-menu" onClick={(e) => e.stopPropagation()}>
-            <label><Image size={20}/> Photos & Videos <input type="file" accept="image/*,video/*" hidden onChange={(e) => handleFileSelected(e.target.files[0], e.target.files[0].type.startsWith('video') ? 'video' : 'image')} /></label>
-            <label><FileText size={20}/> Document <input type="file" accept=".pdf,.doc,.docx" hidden onChange={(e) => handleFileSelected(e.target.files[0], 'doc')} /></label>
-          </div>
-        )}
-
         {activeReply && (
           <div className="reply-preview">
             <div className="reply-bar">
@@ -626,6 +617,17 @@ useEffect(() => {
             </p>
           </div>
         )}
+
+      <div className="input-row">
+        <button className="plus-btn" onClick={(e) => { e.stopPropagation(); setShowFileMenu(!showFileMenu); }}><Plus /></button>
+        <button className={`mic-btn ${isRecording ? 'recording' : ''}`} onClick={isRecording ? stopRecording : startRecording}>{isRecording ? <X /> : <Mic />}</button>
+        {showFileMenu && (
+          <div className="file-menu" onClick={(e) => e.stopPropagation()}>
+            <label><Image size={20}/> Photos & Videos <input type="file" accept="image/*,video/*" hidden onChange={(e) => handleFileSelected(e.target.files[0], e.target.files[0].type.startsWith('video') ? 'video' : 'image')} /></label>
+            <label><FileText size={20}/> Document <input type="file" accept=".pdf,.doc,.docx" hidden onChange={(e) => handleFileSelected(e.target.files[0], 'doc')} /></label>
+          </div>
+        )}
+
         {/* <div className="message-input-div" contentEditable="true" role="textbox" aria-multiline="true" ref={inputRef} onInput={(e) => setInput(e.currentTarget.innerText)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }} /> */}
         <div 
           className="message-input-div" 
@@ -656,6 +658,7 @@ useEffect(() => {
         />
         <button onClick={() => sendMessage()} className="send-btn"><Send /></button>
       </div>
+    </div>
      
               {pendingMedia && (
                 <div className="media-preview-modal">
