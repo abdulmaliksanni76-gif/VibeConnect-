@@ -1004,16 +1004,17 @@
 
 @media (max-width: 600px) {
   .reply-preview {
-    /* padding: 4px 8px; */
-    margin-left: -10px;
-  }
-  
-  .reply-text-preview {
-    font-size: 0.75rem; /* Slightly smaller text for mobile */
+    flex-shrink: 0;      /* Prevents the container from shrinking smaller than content */
+    min-width: 0;        /* Allows the container to be smaller than content if needed */
+    max-width: 100%;     /* Ensure it never exceeds the screen width */
+    padding: 4px 8px;
   }
 
-  .reply-bar span {
-    font-size: 0.7rem;
+  .reply-text-preview {
+    font-size: 0.75rem;
+    white-space: nowrap; /* Forces one line */
+    overflow: hidden;    /* Clips the overflow */
+    text-overflow: ellipsis; /* Adds the ... */
   }
 }
 
