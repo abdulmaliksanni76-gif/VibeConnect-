@@ -1182,3 +1182,21 @@
   transform: scale(1.05);
 }
 
+.message-bubble {
+  position: relative;
+  transition: transform 0.2s ease-out;
+  touch-action: pan-y; /* Allows scrolling up/down but captures side swipes */
+}
+
+/* Optional: Add a subtle icon when swiping */
+.message-bubble.swiping {
+  transform: translateX(20px);
+}
+
+/* Add to your CSS file */
+.message-wrapper {
+  /* This prevents the page from scrolling while swiping horizontally */
+  touch-action: pan-y; 
+  /* Adds a smooth feel when the user initiates a swipe */
+  transition: transform 0.1s ease-out;
+}

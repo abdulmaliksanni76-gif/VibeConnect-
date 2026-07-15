@@ -463,11 +463,35 @@ useEffect(() => {
             }
             console.log("Rendering message ID:", m._id, "with fileName:", m.fileName);
           return (
-            <div key={m._id} id={m._id}>
-            {/* <div key={m._id}> */}
-              {showDate && <div className="date-divider"><span>{getRelativeDate(m.createdAt)}</span></div>}
-              <div className={`message-wrapper ${m.sender?._id === userId ? 'sent-wrapper' : 'received-wrapper'}`} 
-                   onContextMenu={(e) => { e.preventDefault(); setMenu({ visible: true, x: e.clientX, y: e.clientY, messageId: m._id }); }}>
+            // <div key={m._id} id={m._id}>
+            // {/* <div key={m._id}> */}
+            //   {showDate && <div className="date-divider"><span>{getRelativeDate(m.createdAt)}</span></div>}
+            //   <div className={`message-wrapper ${m.sender?._id === userId ? 'sent-wrapper' : 'received-wrapper'}`} 
+            //        onContextMenu={(e) => { e.preventDefault(); setMenu({ visible: true, x: e.clientX, y: e.clientY, messageId: m._id }); }}>
+            <div 
+  key={m._id} 
+  id={m._id}
+  // NEW: Add these touch handlers
+  onTouchStart={(e) => setTouchStart(e.touches[0].clientX)}
+  onTouchEnd={(e) => {
+    const touchEnd = e.changedTouches[0].clientX;
+    const diff = touchEnd - touchStart;
+    
+    // If swiped right by more than 60px, trigger reply
+    if (diff > 60) {
+      setReplyingTo(m); 
+      inputRef.current?.focus();
+    }
+  }}
+>
+  {showDate && <div className="date-divider"><span>{getRelativeDate(m.createdAt)}</span></div>}
+  <div 
+    className={`message-wrapper ${m.sender?._id === userId ? 'sent-wrapper' : 'received-wrapper'}`} 
+    onContextMenu={(e) => { 
+      e.preventDefault(); 
+      setMenu({ visible: true, x: e.clientX, y: e.clientY, messageId: m._id }); 
+    }}
+  >
                 <div className={`message-bubble ${m.sender?._id === userId ? 'sent' : 'received'} ${m.fileType ? 'media-bubble' : ''}`}>
   
                   {m.fileType === 'doc' ? (
