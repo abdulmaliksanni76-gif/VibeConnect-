@@ -844,9 +844,19 @@ const formatTime = (seconds)=>{
 
         {input.trim() ? (
 
+            // <button
+            //     className="send-btn"
+            //     onClick={sendMessage}
+            // >
+            //     <Send size={20}/>
+            // </button>
+
             <button
                 className="send-btn"
-                onClick={sendMessage}
+                onClick={() => {
+                    console.log("Send button clicked");
+                    sendMessage();
+                }}
             >
                 <Send size={20}/>
             </button>
