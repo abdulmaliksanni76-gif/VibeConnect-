@@ -179,11 +179,21 @@ const handleTouchEnd = (e, message) => {
     });
 
     socket.on("recording", (data) => {
+
         console.log("Recording event received:", data);
 
+        console.log("Sender:", data.senderId);
+
+        console.log("Recipient:", recipient?._id);
+
+        console.log(data.senderId === recipient?._id);
+
         if (data.senderId === recipient?._id) {
+
             setIsRecipientRecording(true);
+
         }
+
     });
 
     socket.on("stop_recording", (data) => {
@@ -843,13 +853,6 @@ const formatTime = (seconds)=>{
         />
 
         {input.trim() ? (
-
-            // <button
-            //     className="send-btn"
-            //     onClick={sendMessage}
-            // >
-            //     <Send size={20}/>
-            // </button>
 
             <button
                 className="send-btn"
