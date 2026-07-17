@@ -171,11 +171,11 @@ const handleTouchEnd = (e, message) => {
     socket.on("message_delivered", handleDelivered);
     socket.on("get_online_users", setOnlineUsers);
     socket.on("typing", (data) => {
-      if (data.senderId === recipient?._id) setIsRecipientTyping(true);
+      if (String(data.senderId) === String(recipient?._id)) setIsRecipientTyping(true);
     });
 
     socket.on("stop_typing", (data) => {
-      if (data.senderId === recipient?._id) setIsRecipientTyping(false);
+      if (String(data.senderId) === String(recipient?._id)) setIsRecipientTyping(false);
     });
 
     socket.on("recording", (data) => {
@@ -188,7 +188,8 @@ const handleTouchEnd = (e, message) => {
 
         console.log(data.senderId === recipient?._id);
 
-        if (data.senderId === recipient?._id) {
+        // if (data.senderId === recipient?._id) {
+        if (String(data.senderId) === String(recipient?._id)) {
 
             setIsRecipientRecording(true);
 
@@ -199,7 +200,8 @@ const handleTouchEnd = (e, message) => {
     socket.on("stop_recording", (data) => {
         console.log("Stop recording event:", data);
 
-        if (data.senderId === recipient?._id) {
+        // if (data.senderId === recipient?._id) {
+        if (String(data.senderId) === String(recipient?._id)) {
             setIsRecipientRecording(false);
         }
     });
@@ -213,7 +215,7 @@ const handleTouchEnd = (e, message) => {
       socket.off("recording");
       socket.off("stop_recording");
     };
-  }, [conversationId, socket, userId]);
+  }, [conversationId, socket, userId, recipient]);
 
   const sendMessage = async (text = null, fileData = null) => {
     if (editingMessageId) {
