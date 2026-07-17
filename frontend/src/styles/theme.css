@@ -1,0 +1,102 @@
+/* ===========================================
+   VibeConnect Theme
+   Luxury Espresso Edition
+=========================================== */
+
+:root {
+
+    /* ========= APP BACKGROUNDS ========= */
+
+    --bg: #171210;
+    --bg-secondary: #211916;
+    --bg-elevated: #2A201C;
+    --bg-hover: #342822;
+
+    /* ========= MESSAGE BUBBLES ========= */
+
+    --bubble-sent: #5E4335;
+    --bubble-received: #2A211D;
+
+    /* ========= GLASS ========= */
+
+    --glass: rgba(255,255,255,.04);
+    --glass-hover: rgba(255,255,255,.07);
+
+    /* ========= BORDERS ========= */
+
+    --border: rgba(255,255,255,.06);
+    --border-strong: rgba(255,255,255,.10);
+
+    /* ========= TEXT ========= */
+
+    --text: #F4EEE8;
+    --text-secondary: #BCAEA3;
+    --text-muted: #8F8075;
+
+    /* ========= BRAND ========= */
+
+    --accent: #C89B6D;
+    --accent-hover: #D5AB7E;
+
+    /* ========= STATUS ========= */
+
+    --online: #3DDC84;
+    --danger: #D85B5B;
+    --warning: #E9B44C;
+
+    /* ========= SHADOWS ========= */
+
+    --shadow-sm: 0 4px 12px rgba(0,0,0,.18);
+
+    --shadow-md: 0 8px 25px rgba(0,0,0,.28);
+
+    --shadow-lg: 0 18px 45px rgba(0,0,0,.42);
+
+    /* ========= GRADIENTS ========= */
+
+    --gradient-main:
+        linear-gradient(
+            180deg,
+            #211916 0%,
+            #171210 100%
+        );
+
+    --gradient-card:
+        linear-gradient(
+            145deg,
+            #2A201C 0%,
+            #1B1512 100%
+        );
+
+    --gradient-bubble:
+        linear-gradient(
+            145deg,
+            #6B4B3A 0%,
+            #5A4033 100%
+        );
+
+    /* ========= RADIUS ========= */
+
+    --radius-xs: 8px;
+    --radius-sm: 12px;
+    --radius-md: 16px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+    --radius-round: 999px;
+
+    /* ========= TRANSITIONS ========= */
+
+    --transition-fast: .18s ease;
+
+    --transition: .28s ease;
+
+    --transition-slow: .45s ease;
+
+    /* Message status colors */
+--tick-sent: #A8A8A8;
+--tick-delivered: #D4AF37;
+--tick-read: #F0C85A;
+    
+
+}
+

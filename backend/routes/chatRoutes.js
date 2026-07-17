@@ -229,12 +229,33 @@ await newMessage.save();
 router.post('/upload-image', auth, uploadChatImage);
 
 // Get chat info
+// router.get('/info/:conversationId', auth, async (req, res) => {
+//   try {
+//     const chat = await Conversation.findById(req.params.conversationId).populate('participants', 'username');
+//     res.json(chat);
+//   } catch (err) {
+//     res.status(500).json({ message: "Error" });
+//   }
+// });
+
 router.get('/info/:conversationId', auth, async (req, res) => {
   try {
-    const chat = await Conversation.findById(req.params.conversationId).populate('participants', 'username');
+    const chat = await Conversation.findById(req.params.conversationId)
+      .populate('participants', 'username photoUrl');
+
+    if (!chat) {
+      return res.status(404).json({
+        message: "Conversation not found"
+      });
+    }
+
     res.json(chat);
+
   } catch (err) {
-    res.status(500).json({ message: "Error" });
+    console.error(err);
+    res.status(500).json({
+      message: "Error fetching chat info"
+    });
   }
 });
 

@@ -1,11 +1,16 @@
 import { useContext, useEffect, useState, useRef } from 'react';
 import { SocketContext } from '../context/SocketContext';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Send, ArrowLeft, Check, CheckCheck, Edit, Trash2, Plus, Image, FileText, X, Download, Mic, Play, Copy, Reply, ArrowDown } from 'lucide-react';
+import { Send, ArrowLeft, Check, CheckCheck, Edit, Trash2, Plus, Image, FileText, X, Download, Mic, Play, Pause, Copy, Reply, ArrowDown } from 'lucide-react';
 import axios from 'axios';
 import './Chat.css';
 import AudioPlayer from '../components/AudioPlayer';
 import { useMemo } from 'react';
+import MessageList from "../components/MessageList";
+import ChatHeader from "../components/ChatHeader";
+import MessageBubble from "../components/MessageBubble";
+import { useLayoutEffect } from "react";
+
 
 const BASE_URL = import.meta.env.VITE_API_URL || "";
 
@@ -28,7 +33,7 @@ const Chat = () => {
   const [input, setInput] = useState("");
   const [chatData, setChatData] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
-  const [menu, setMenu] = useState({ visible: false, x: 0, y: 0, messageId: null, isPositioned: false });
+  const [menu, setMenu] = useState({ visible: false, x: 0, y: 0, messageId: null, ready: false, });
   const [editingMessageId, setEditingMessageId] = useState(null);
   const [showFileMenu, setShowFileMenu] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -43,6 +48,10 @@ const Chat = () => {
   const isUserAtBottom = useRef(true);
   const prevMessagesLength = useRef(messages.length);
   const isDeleting = useRef(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const discardRecording = useRef(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [isRecipientRecording,setIsRecipientRecording] = useState(false);
   
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -52,39 +61,39 @@ const Chat = () => {
 
   const userId = localStorage.getItem("userId");
   const recipient = chatData?.participants?.find(p => p._id !== userId);
+  console.log("Recipient:", recipient);
 
   useEffect(() => {
   if (messages.length > prevMessagesLength.current && !showScrollBtn) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }
   
-  // Update the ref for next time
   prevMessagesLength.current = messages.length;
 }, [messages]);
 
 useEffect(() => {
-  // 1. If we are in the middle of a deletion, stop everything
   if (isDeleting.current) return;
 
   if (!showScrollBtn) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }
-}, [messages]); // This single hook handles all scroll-to-bottom logic
+}, [messages]); 
 
  const handleScroll = (e) => {
-  const { scrollTop, scrollHeight, clientHeight } = e.target;
-  
-  // Calculate distance from bottom: 
-  // If we are more than 100px from the bottom, show the button
-  const isAtBottom = (scrollHeight - scrollTop - clientHeight) < 100;
-  
-  setShowScrollBtn(!isAtBottom);
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+
+    console.log(scrollTop, scrollHeight, clientHeight);
+
+    const isAtBottom =
+        scrollHeight - scrollTop - clientHeight < 100;
+
+    setShowScrollBtn(!isAtBottom);
 };
 const handleTouchStart = (e) => setTouchStart(e.targetTouches[0].clientX);
 
 const handleTouchEnd = (e, message) => {
   const touchEnd = e.changedTouches[0].clientX;
-  if (touchEnd - touchStart > 50) { // Threshold for swipe right
+  if (touchEnd - touchStart > 50) { 
     setReplyingTo(message);
     inputRef.current?.focus();
   }
@@ -149,7 +158,6 @@ const handleTouchEnd = (e, message) => {
         socket.emit("mark_delivered", { messageId: msg._id, senderId: msg.sender?._id });
       }
     };
-    // const handleUpdated = (updatedMsg) => setMessages(prev => prev.map(m => m._id === updatedMsg._id ? updatedMsg : m));
     const handleUpdated = (updatedMsg) => {
       setMessages(prev => prev.map(m => m._id === updatedMsg._id ? updatedMsg : m));
       setReplyingTo(prev => (prev && prev._id === updatedMsg._id ? updatedMsg : prev));
@@ -170,32 +178,32 @@ const handleTouchEnd = (e, message) => {
       if (data.senderId === recipient?._id) setIsRecipientTyping(false);
     });
 
+    socket.on("recording", (data) => {
+        console.log("Recording event received:", data);
+
+        if (data.senderId === recipient?._id) {
+            setIsRecipientRecording(true);
+        }
+    });
+
+    socket.on("stop_recording", (data) => {
+        console.log("Stop recording event:", data);
+
+        if (data.senderId === recipient?._id) {
+            setIsRecipientRecording(false);
+        }
+    });
+
     return () => {
       socket.off("receive_message", handleReceive);
       socket.off("message_updated", handleUpdated);
       socket.off("message_deleted", handleDeleted);
       socket.off("message_delivered", handleDelivered);
       socket.off("get_online_users");
+      socket.off("recording");
+      socket.off("stop_recording");
     };
   }, [conversationId, socket, userId]);
-
-  // const sendMessage = async (text = null, fileData = null) => {
-  //   if (editingMessageId) {
-  //     const res = await axios.put(`${BASE_URL}/api/chat/message/${editingMessageId}`, 
-  //       { text: text || input }, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-  //     if (res.status === 200) {
-  //       socket.emit("message_updated", res.data);
-  //       setEditingMessageId(null);
-  //       setInput("");
-  //       if (inputRef.current) inputRef.current.innerText = '';
-  //     }
-  //     return;
-  //   }
-  //   if (!input.trim() && !fileData) return;
-  //   socket.emit("send_message", { conversationId, text: text || input, senderId: userId, fileUrl: fileData?.fileUrl, fileType: fileData?.fileType });
-  //   setInput("");
-  //   if (inputRef.current) inputRef.current.innerText = '';
-  // };
 
   const sendMessage = async (text = null, fileData = null) => {
     if (editingMessageId) {
@@ -212,49 +220,24 @@ const handleTouchEnd = (e, message) => {
 
     if (!input.trim() && !fileData) return;
 
-    // New payload includes replyTo ID if it exists
-    socket.emit("send_message", { 
-      conversationId, 
-      text: text || input, 
-      senderId: userId, 
-      fileUrl: fileData?.fileUrl, 
-      fileType: fileData?.fileType,
-      replyTo: replyingTo?._id || null 
+    socket.emit("send_message", {
+        conversationId,
+        text: text || input,
+        senderId: userId,
+
+        fileUrl: fileData?.fileUrl,
+        fileType: fileData?.fileType,
+        fileName: fileData?.fileName,
+
+        replyTo: replyingTo?._id || null
     });
 
-    // Clear states after sending
     setReplyingTo(null);
     setInput("");
     if (inputRef.current) inputRef.current.innerText = '';
   };
 
-  // const deleteMessage = async (messageId) => {
-  //   await axios.delete(`${BASE_URL}/api/chat/message/${messageId}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-  //   setMessages(prev => prev.filter(m => m._id !== messageId));
-  //   socket.emit("message_deleted", { messageId, conversationId });
-  //   setMenu({ visible: false, x: 0, y: 0, messageId: null });
-  // };
-
-//   const deleteMessage = async (messageId) => {
-//   // Set the flag to TRUE
-//   isDeleting.current = true;
-  
-//   await axios.delete(`${BASE_URL}/api/chat/message/${messageId}`, { 
-//     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } 
-//   });
-  
-//   setMessages(prev => prev.filter(m => m._id !== messageId));
-//   socket.emit("message_deleted", { messageId, conversationId });
-//   setMenu({ visible: false, x: 0, y: 0, messageId: null });
-
-//   // Reset the flag after a brief delay to allow the state to update
-//   setTimeout(() => {
-//     isDeleting.current = false;
-//   }, 500);
-// };
-
 const deleteMessage = async (messageId) => {
-  // Set the flag to TRUE
   isDeleting.current = true;
   
   try {
@@ -268,7 +251,6 @@ const deleteMessage = async (messageId) => {
   } catch (error) {
     console.error("Delete failed", error);
   } finally {
-    // Reset the flag after a delay regardless of success/failure
     setTimeout(() => {
       isDeleting.current = false;
     }, 1000);
@@ -283,7 +265,6 @@ const deleteMessage = async (messageId) => {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } 
     });
     
-    // FIX: If it's an audio file/voice note, send an empty string instead of file.name
     const messageText = type === 'audio' ? "" : file.name;
     
     await sendMessage(messageText, { fileUrl: res.data.filePath, fileType: type });
@@ -305,11 +286,10 @@ const finalizeMediaUpload = async () => {
 
   console.log("Sending File Name:", pendingMedia.file.name);
   
-  // Send the message: 'caption' is the text, 'fileName' is a new property
   await sendMessage(caption, { 
     fileUrl: res.data.filePath, 
     fileType: pendingMedia.type,
-    fileName: pendingMedia.file.name // This key MUST match what the backend expects
+    fileName: pendingMedia.file.name 
 });
   
   setPendingMedia(null);
@@ -317,10 +297,22 @@ const finalizeMediaUpload = async () => {
 };
 
 const scrollToMessage = (msgId) => {
-  const element = document.getElementById(msgId);
-  if (element) {
-    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
+
+    const element = document.getElementById(msgId);
+
+    if (!element) return;
+
+    element.scrollIntoView({
+        behavior:"smooth",
+        block:"center"
+    });
+
+    element.classList.add("message-highlight");
+
+    setTimeout(() => {
+        element.classList.remove("message-highlight");
+    },1000);
+
 };
 
 
@@ -329,60 +321,172 @@ const previewUrl = useMemo(() => {
   return pendingMedia ? URL.createObjectURL(pendingMedia.file) : null;
 }, [pendingMedia]);
 
-// Cleanup memoized URL when component unmounts or media is cleared
 useEffect(() => {
   return () => {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
   };
 }, [previewUrl]);
 
+
   const startRecording = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const mediaRecorder = new MediaRecorder(stream);
-    mediaRecorderRef.current = mediaRecorder;
-    audioChunksRef.current = [];
-    mediaRecorder.ondataavailable = (e) => audioChunksRef.current.push(e.data);
-    mediaRecorder.onstop = async () => {
-      const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-      handleFileUpload(new File([audioBlob], "voice.webm", { type: 'audio/webm' }), 'audio');
-    };
-    mediaRecorder.start();
-    setIsRecording(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
+
+      const mediaRecorder = new MediaRecorder(stream);
+
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (e) =>
+        audioChunksRef.current.push(e.data);
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: "audio/webm",
+        });
+
+        if (!discardRecording.current) {
+            handleFileUpload(
+                new File([audioBlob], "voice.webm", {
+                    type: "audio/webm",
+                }),
+                "audio"
+            );
+        }
+
+        discardRecording.current = false;
+
+        setRecordingTime(0);
+      };
+
+      mediaRecorder.start();
+
+      setIsRecording(true);
+    } catch (err) {
+      console.log(err);
+    }
+
+    console.log("Sending recording event");
+
+    socket.emit("recording",{
+        conversationId,
+        senderId:userId
+    });
   };
 
-  const stopRecording = () => { mediaRecorderRef.current?.stop(); setIsRecording(false); };
+  const stopRecording = () => {
+
+      mediaRecorderRef.current?.stop();
+
+      mediaRecorderRef.current?.stream
+          ?.getTracks()
+          .forEach(track => track.stop());
+
+      console.log("Stopping recording event");
+
+      socket.emit("stop_recording",{
+          conversationId,
+          senderId:userId
+      });
+
+      setIsRecording(false);
+
+  };
+
+  const cancelRecording = () => {
+
+      discardRecording.current = true;
+
+      // Tell the other user that recording has stopped
+      socket.emit("stop_recording", {
+          conversationId,
+          senderId: userId,
+      });
+
+      mediaRecorderRef.current?.stop();
+
+      mediaRecorderRef.current?.stream
+          ?.getTracks()
+          .forEach(track => track.stop());
+
+      setIsRecording(false);
+
+      setRecordingTime(0);
+
+  };
+
+  const sendRecording = () => {
+
+      discardRecording.current = false;
+
+      mediaRecorderRef.current?.stop();
+
+      mediaRecorderRef.current?.stream
+          ?.getTracks()
+          .forEach(track => track.stop());
+
+      setIsRecording(false);
+
+  };
+
+  const pauseRecording = () => {
+
+      mediaRecorderRef.current?.pause();
+
+      setIsPaused(true);
+
+  };
+
+  const resumeRecording = () => {
+
+      mediaRecorderRef.current?.resume();
+
+      setIsPaused(false);
+
+  };
 
   const handleInputChange = (e) => {
-  setInput(e.target.value); // Use your actual input state name (you defined it as 'input')
+  setInput(e.target.value);
 
   socket.emit("typing", {
-    conversationId: conversationId, // Use the correct variable name here
+    conversationId: conversationId, 
     senderId: userId
   });
 };
 
   useEffect(() => {
-    if (conversationId) { // Changed from currentChatId to conversationId
+    if (conversationId) { 
       socket.emit("join_chat", conversationId);
     }
-  }, [conversationId, socket]); // Include socket in dependency array
+  }, [conversationId, socket]); 
 
-//   const activeReply = useMemo(() => {
-//   if (!replyingTo) return null;
-//   // This will automatically update whenever the messages array changes (e.g., after an edit)
-//   return messages.find(m => m._id === replyingTo._id) || replyingTo;
-// }, [replyingTo, messages]);
+useEffect(() => {
+
+    if (!isRecording || isPaused) return;
+
+    const interval = setInterval(() => {
+        setRecordingTime(prev => prev + 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+
+}, [isRecording, isPaused]);
+
+
+
+
 
 const activeReply = useMemo(() => {
   if (!replyingTo) return null;
-  // This fetches the latest version of the message from your current state
   return messages.find(m => m._id === replyingTo._id) || replyingTo;
 }, [replyingTo, messages]);
 
 useEffect(() => {
   socket.on("typing", (data) => {
     if (data.senderId !== userId) {
-      setIsRecipientTyping(true); // Assuming this is your state for the typing indicator
+      setIsRecipientTyping(true); 
     }
   });
 
@@ -398,183 +502,188 @@ useEffect(() => {
 
 const handleContextMenu = (e, messageId) => {
   e.preventDefault();
+  e.stopPropagation();
 
-  // Show it off-screen first so we can measure it
-  // setMenu({ visible: true, x: -9999, y: -9999, messageId, ready: false });
-  setMenu({ visible: true, x: e.clientX, y: e.clientY, messageId });
-
-  requestAnimationFrame(() => {
-    if (menuRef.current) {
-      const { offsetWidth, offsetHeight } = menuRef.current;
-      let x = e.clientX;
-      let y = e.clientY;
-
-      // Logic to flip
-      if (x + offsetWidth > window.innerWidth) x = e.clientX - offsetWidth;
-      if (y + offsetHeight > window.innerHeight) y = e.clientY - offsetHeight;
-
-      // Update position and set ready: true
-      setMenu({ visible: true, x, y, messageId, ready: true });
-    }
+  setMenu({
+    visible: true,
+    x: e.clientX,
+    y: e.clientY,
+    messageId,
+    ready: false,
   });
 };
 
-useEffect(() => {
-  if (menu.visible && menuRef.current) {
-    const { offsetWidth, offsetHeight } = menuRef.current;
-    let x = menu.x;
-    let y = menu.y;
+useLayoutEffect(() => {
+  if (!menu.visible || !menuRef.current || menu.ready) return;
 
-    if (x + offsetWidth > window.innerWidth) x = menu.x - offsetWidth;
-    if (y + offsetHeight > window.innerHeight) y = menu.y - offsetHeight;
+  const { offsetWidth, offsetHeight } = menuRef.current;
 
-    // Update position AND set isPositioned to true
-    setMenu(prev => ({ ...prev, x, y, isPositioned: true }));
-  } else {
-    // Reset when hidden
-    setMenu(prev => ({ ...prev, isPositioned: false }));
+  let x = menu.x;
+  let y = menu.y;
+
+  if (x + offsetWidth > window.innerWidth) {
+    x = window.innerWidth - offsetWidth - 10;
   }
-}, [menu.visible, menu.x, menu.y]);
+
+  if (y + offsetHeight > window.innerHeight) {
+    y = window.innerHeight - offsetHeight - 10;
+  }
+
+  x = Math.max(10, x);
+  y = Math.max(10, y);
+
+  setMenu((prev) => ({
+    ...prev,
+    x,
+    y,
+    ready: true,
+  }));
+}, [menu]);
+
+const formatTime = (seconds)=>{
+
+    const mins=Math.floor(seconds/60);
+
+    const secs=seconds%60;
+
+    return `${String(mins).padStart(2,"0")}:${String(secs).padStart(2,"0")}`;
+
+}
 
   return (
-    <div className="chat-app-container" onClick={() => { setMenu({ visible: false }); setShowFileMenu(false); }}>
-      <div className="chat-header">
-        <button className="back-btn" onClick={() => navigate('/chat')}><ArrowLeft /></button>
-        <div className='user-info'>
-          <h3>{recipient?.username || "Chat"}</h3>
-          {/* <small>{onlineUsers.includes(recipient?._id) ? "Online" : "Offline"}</small> */}
-          {isRecipientTyping ? (
-            <small className="typing-indicator">typing...</small>
-          ) : (
-            <small>{onlineUsers.includes(recipient?._id) ? "Online" : "Offline"}</small>
-          )}
-        </div>
-      </div>
+    <div
+    className="chat-app-container"
+    onClick={() => {
+        if (menu.visible) {
+            setMenu({
+                visible: false,
+                x: 0,
+                y: 0,
+                messageId: null,
+                isPositioned: false,
+            });
+        }
+
+        setShowFileMenu(false);
+    }}
+>
+      <ChatHeader
+          recipient={recipient}
+          onlineUsers={onlineUsers}
+          isRecipientTyping={isRecipientTyping}
+          isRecipientRecording={isRecipientRecording}
+          navigate={navigate}
+      />
 
 <div className="chat-body" onScroll={handleScroll} style={{ position: 'relative', overflowY: 'auto', flex: 1 }}>
       <div className="messages-window">
         {messages.map((m, index) => {
-          const currentDate = new Date(m.createdAt).toDateString();
-          const prevDate = index > 0 ? new Date(messages[index - 1].createdAt).toDateString() : null;
-          const showDate = index === 0 || currentDate !== prevDate;
-          console.log("Rendering message:", m);
-            if (m.fileType === 'doc' && !m.fileName) {
-              console.warn("CRITICAL: This document is missing a fileName property!", m);
-            }
-            console.log("Rendering message ID:", m._id, "with fileName:", m.fileName);
-          return (
-            // <div key={m._id} id={m._id}>
-            // {/* <div key={m._id}> */}
-            //   {showDate && <div className="date-divider"><span>{getRelativeDate(m.createdAt)}</span></div>}
-            //   <div className={`message-wrapper ${m.sender?._id === userId ? 'sent-wrapper' : 'received-wrapper'}`} 
-            //        onContextMenu={(e) => { e.preventDefault(); setMenu({ visible: true, x: e.clientX, y: e.clientY, messageId: m._id }); }}>
-            <div 
-  key={m._id} 
-  id={m._id}
-  // NEW: Add these touch handlers
-  onTouchStart={(e) => setTouchStart(e.touches[0].clientX)}
-  onTouchEnd={(e) => {
-    const touchEnd = e.changedTouches[0].clientX;
-    const diff = touchEnd - touchStart;
-    
-    // If swiped right by more than 60px, trigger reply
-    if (diff > 60) {
-      setReplyingTo(m); 
-      inputRef.current?.focus();
-    }
-  }}
->
-  {showDate && <div className="date-divider"><span>{getRelativeDate(m.createdAt)}</span></div>}
-  <div 
-    className={`message-wrapper ${m.sender?._id === userId ? 'sent-wrapper' : 'received-wrapper'}`} 
-    onContextMenu={(e) => { 
-      e.preventDefault(); 
-      setMenu({ visible: true, x: e.clientX, y: e.clientY, messageId: m._id }); 
-    }}
-  >
-                <div className={`message-bubble ${m.sender?._id === userId ? 'sent' : 'received'} ${m.fileType ? 'media-bubble' : ''}`}>
-  
-                  {m.fileType === 'doc' ? (
-                    <div className="doc-preview" onClick={() => downloadFile(m.fileUrl, m.fileName)}>
-                      <FileText size={32} />
-                      <div className="doc-info">
-                        <span className="doc-name">
-                          {m.fileName 
-                            ? (m.fileName.includes('-') ? m.fileName.split('-').slice(1).join('-') : m.fileName)
-                            : (m.fileUrl ? m.fileUrl.split('/').pop().replace(/^\d+-/, "") : "Document")
-                          }
-                        </span>
-                      </div>
-                    </div>
-                  ) : m.fileType === 'image' ? (
-                    <img src={`${BASE_URL}${m.fileUrl}`} className="msg-media-preview" onClick={() => setFullScreenMedia({url: m.fileUrl, type: 'image'})} />
-                  ) : m.fileType === 'video' ? (
-                    <div className="video-preview" onClick={() => setFullScreenMedia({url: m.fileUrl, type: 'video'})}>
-                      <video src={`${BASE_URL}${m.fileUrl}`} preload="metadata" />
-                      <div className="play-overlay"><Play fill="white" size={40} /></div>
-                    </div>
-                  ) : m.fileType === 'audio' ? (
-                    <AudioPlayer url={`${BASE_URL}${m.fileUrl}`} />
-                  ) : null}
+        const previousMessage = messages[index - 1];
+        const nextMessage = messages[index + 1];
 
-                  {m.replyTo && (
-                    // <div className="quoted-message">
-                    <div className="quoted-message" onClick={() => scrollToMessage(m.replyTo._id)}>
-                      <div className="quoted-sender">
-                        {/* If it's an object, get the name; otherwise, default to 'Replying...' */}
-                        {typeof m.replyTo === 'object' ? m.replyTo.sender?.username : "Replying to..."}
-                      </div>
-                      <p className="quoted-text">
-                        {typeof m.replyTo === 'object' 
-                          ? (m.replyTo.text || (m.replyTo.fileType === 'audio' ? "🎤 Voice Note" : "📎 File"))
-                          : "Message"}
-                      </p>
-                    </div>
-                  )}
+        const isSameSenderAsPrevious =
+          previousMessage &&
+          previousMessage.sender?._id === m.sender?._id &&
+          new Date(previousMessage.createdAt).toDateString() ===
+            new Date(m.createdAt).toDateString();
 
-                  {/* 3. CAPTION: Only renders if m.text has content */}
-                  {m.text && (
-                    <p className={m.fileType ? "media-caption" : "message-text"}>
-                      {m.text}
-                    </p>
-                  )}
+        const isSameSenderAsNext =
+          nextMessage &&
+          nextMessage.sender?._id === m.sender?._id &&
+          new Date(nextMessage.createdAt).toDateString() ===
+            new Date(m.createdAt).toDateString();
+        const currentDate = new Date(m.createdAt).toDateString();
 
-                  {/* 4. TIME & STATUS */}
-                  <div className="msg-time">
-                    {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    {m.sender?._id === userId && (
-                      <span className="status-icons">{m.status === 'delivered' ? <CheckCheck size={14} /> : <Check size={14} />}</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
+        const prevDate =
+            index > 0
+                ? new Date(messages[index - 1].createdAt).toDateString()
+                : null;
+
+        const showDate =
+            index === 0 || currentDate !== prevDate;
+
+    return (
+        <MessageBubble
+            key={m._id}
+            message={m}
+            isMine={m.sender?._id === userId}
+            userId={userId}
+            showDate={showDate}
+            dateLabel={getRelativeDate(m.createdAt)}
+            isSameSenderAsPrevious={isSameSenderAsPrevious}
+            isSameSenderAsNext={isSameSenderAsNext}
+            downloadFile={downloadFile}
+            setFullScreenMedia={setFullScreenMedia}
+            scrollToMessage={scrollToMessage}
+            handleContextMenu={handleContextMenu}
+            setReplyingTo={setReplyingTo}
+            inputRef={inputRef}
+            setMenu={setMenu}
+            menuRef={menuRef}
+        />
+        );
+    })}
         <div ref={messagesEndRef} style={{ height: "1px", width: "100%" }} />
       </div>
         
       </div>
 
+
       {fullScreenMedia && (
-        <div className="fullscreen-overlay">
-          <button className="close-fullscreen" onClick={() => setFullScreenMedia(null)}><X size={30} /></button>
-          <button className="download-fullscreen" onClick={() => downloadFile(fullScreenMedia.url, 'media')}><Download size={30} /></button>
-          {fullScreenMedia.type === 'image' ? <img src={`${BASE_URL}${fullScreenMedia.url}`} className="fullscreen-content" /> : <video src={`${BASE_URL}${fullScreenMedia.url}`} controls autoPlay className="fullscreen-content" />}
+        <div
+          className="fullscreen-overlay"
+          onClick={() => setFullScreenMedia(null)}
+        >
+          <button
+            className="close-fullscreen"
+            onClick={(e) => {
+              e.stopPropagation();
+              setFullScreenMedia(null);
+            }}
+          >
+            <X size={26} />
+          </button>
+
+          <button
+            className="download-fullscreen"
+            onClick={(e) => {
+              e.stopPropagation();
+              downloadFile(fullScreenMedia.url, "media");
+            }}
+          >
+            <Download size={24} />
+          </button>
+
+          {fullScreenMedia.type === "image" ? (
+            <img
+              src={`${BASE_URL}${fullScreenMedia.url}`}
+              className="fullscreen-content"
+              onClick={(e) => e.stopPropagation()}
+            />
+          ) : (
+            <video
+              src={`${BASE_URL}${fullScreenMedia.url}`}
+              controls
+              autoPlay
+              className="fullscreen-content"
+              onClick={(e) => e.stopPropagation()}
+            />
+          )}
         </div>
       )}
 
       {menu.visible && (
-        <div 
+        
+        <div
           ref={menuRef}
           className="context-menu"
-          style={{ 
-            position: 'fixed',
-            top: `${menu.y}px`,
-            left: `${menu.x}px`,
-            zIndex: 1000,
-            // Only show when the calculation is done
-            visibility: menu.isPositioned ? 'visible' : 'hidden' 
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            position: "fixed",
+            top: menu.y,
+            left: menu.x,
+            zIndex: 99999,
+            visibility: menu.ready ? "visible" : "hidden",
           }}
         >
           {(() => {
@@ -583,14 +692,6 @@ useEffect(() => {
             return (
               <>
                 <button onClick={() => { navigator.clipboard.writeText(m.text); setMenu({ visible: false }); }}><Copy size={18}/>Copy</button>
-                {/* <button onClick={() => {
-                  const m = messages.find(msg => msg._id === menu.messageId);
-                  setReplyingTo(m); 
-                  setMenu({ visible: false });
-                  inputRef.current?.focus();
-                }}>
-                  <Reply size={18} /> Reply
-                </button> */}
                 <button onClick={() => {
                   // Pass the ID or the message object, but ensure it's up-to-date
                   const m = messages.find(msg => msg._id === menu.messageId);
@@ -600,6 +701,7 @@ useEffect(() => {
                 }}>
                   <Reply size={18} /> Reply
                 </button>
+                <div className="menu-divider" />
                 {isSender && (
                   <>
                     <button onClick={() => { setEditingMessageId(m._id); setMenu({visible: false}); }}><Edit size={18}/>Edit</button>
@@ -622,69 +724,269 @@ useEffect(() => {
       </button>
       )}
       
+  <div className="input-area">
 
-      <div className="input-area">
-        {activeReply && (
-          <div className="reply-preview">
-            <div className="reply-bar">
-              <span>Replying to {activeReply.sender?.username || "User"}</span>
-              <button className="reply-close-btn" onClick={() => setReplyingTo(null)}>
-                <X size={16} />
-              </button>
+    {activeReply && (
+        <div className="reply-preview">
+
+            <div className="reply-left">
+                <span className="reply-title">
+                    Replying to {activeReply.sender?.username || "User"}
+                </span>
+
+                <p>
+                    {activeReply.text
+                        ? activeReply.text
+                        : activeReply.fileType === "image"
+                        ? "📷 Photo"
+                        : activeReply.fileType === "video"
+                        ? "🎥 Video"
+                        : activeReply.fileType === "audio"
+                        ? "🎤 Voice Note"
+                        : "📄 Document"}
+                </p>
             </div>
-            <p className="reply-text-preview">
-              {activeReply.text 
-                ? activeReply.text 
-                : activeReply.fileType === 'audio' 
-                  ? "🎤 Voice Note" 
-                  : "📷 Media File"}
-            </p>
-          </div>
-        )}
 
-      <div className="input-row">
-        <button className="plus-btn" onClick={(e) => { e.stopPropagation(); setShowFileMenu(!showFileMenu); }}><Plus /></button>
-        <button className={`mic-btn ${isRecording ? 'recording' : ''}`} onClick={isRecording ? stopRecording : startRecording}>{isRecording ? <X /> : <Mic />}</button>
-        {showFileMenu && (
-          <div className="file-menu" onClick={(e) => e.stopPropagation()}>
-            <label><Image size={20}/> Photos & Videos <input type="file" accept="image/*,video/*" hidden onChange={(e) => handleFileSelected(e.target.files[0], e.target.files[0].type.startsWith('video') ? 'video' : 'image')} /></label>
-            <label><FileText size={20}/> Document <input type="file" accept=".pdf,.doc,.docx" hidden onChange={(e) => handleFileSelected(e.target.files[0], 'doc')} /></label>
-          </div>
-        )}
+            <button
+                className="reply-close-btn"
+                onClick={() => setReplyingTo(null)}
+            >
+                <X size={18} />
+            </button>
 
-        {/* <div className="message-input-div" contentEditable="true" role="textbox" aria-multiline="true" ref={inputRef} onInput={(e) => setInput(e.currentTarget.innerText)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }} /> */}
-        <div 
-          className="message-input-div" 
-          contentEditable="true" 
-          role="textbox" 
-          aria-multiline="true" 
-          ref={inputRef} 
-          onInput={(e) => {
-            setInput(e.currentTarget.innerText);
-            
-            // Emit typing event
-            socket.emit("typing", { conversationId, senderId: userId });
+        </div>
+    )}
 
-            // Reset timer to stop typing indicator after 2 seconds of inactivity
-            clearTimeout(window.typingTimer);
-            window.typingTimer = setTimeout(() => {
-              socket.emit("stop_typing", { conversationId, senderId: userId });
-            }, 2000);
-          }} 
-          onKeyDown={(e) => { 
-            if (e.key === 'Enter' && !e.shiftKey) { 
-              e.preventDefault(); 
-              sendMessage(); 
-              // Stop typing immediately when sent
-              socket.emit("stop_typing", { conversationId, senderId: userId });
-            } 
-          }} 
+    {!isRecording ? (
+
+    <div className="composer">
+
+        <button
+            className="plus-btn"
+            onClick={(e)=>{
+                e.stopPropagation();
+                setShowFileMenu(!showFileMenu);
+            }}
+        >
+            <Plus size={22}/>
+        </button>
+
+        <div
+            className="message-input-div"
+            contentEditable
+            ref={inputRef}
+            data-placeholder="Type a message..."
+            role="textbox"
+            suppressContentEditableWarning
+
+            onInput={(e)=>{
+
+                const element=e.currentTarget;
+
+                const text=element.innerText.replace(/\n$/,"").trim();
+
+                if(!text){
+
+                    element.innerHTML="";
+
+                    setInput("");
+
+                    socket.emit("stop_typing",{
+                        conversationId,
+                        senderId:userId
+                    });
+
+                    clearTimeout(window.typingTimer);
+
+                    return;
+
+                }
+
+                setInput(text);
+
+                socket.emit("typing",{
+                    conversationId,
+                    senderId:userId
+                });
+
+                clearTimeout(window.typingTimer);
+
+                window.typingTimer=setTimeout(()=>{
+
+                    socket.emit("stop_typing",{
+                        conversationId,
+                        senderId:userId
+                    });
+
+                },2000);
+
+            }}
+
+            onKeyDown={(e)=>{
+
+                const mobile=window.matchMedia("(pointer: coarse)").matches;
+
+                if(!mobile){
+
+                    if(e.key==="Enter" && !e.shiftKey){
+
+                        e.preventDefault();
+
+                        sendMessage();
+
+                    }
+
+                }
+
+            }}
+
         />
-        <button onClick={() => sendMessage()} className="send-btn"><Send /></button>
-      </div>
+
+        {input.trim() ? (
+
+            <button
+                className="send-btn"
+                onClick={sendMessage}
+            >
+                <Send size={20}/>
+            </button>
+
+        ) : (
+
+            <button
+                className="mic-btn"
+                onClick={() => {
+                    console.log("Mic clicked");
+                    startRecording();
+                }}
+            >
+                <Mic size={20} />
+            </button>
+
+        )}
+
     </div>
+
+    ) : (
+
+    <div className="recording-bar">
+
+        <button
+            className="delete-recording-btn"
+            onClick={cancelRecording}
+        >
+            <Trash2 size={20}/>
+        </button>
+
+        <span className="record-time">
+
+            {formatTime(recordingTime)}
+
+        </span>
+
+        <div className="record-wave">
+
+            {Array.from({length:28}).map((_,i)=>
+
+                <span
+                    key={i}
+                    style={{
+                        animationDelay:`${i*0.06}s`
+                    }}
+                />
+
+            )}
+
+        </div>
+
+        <button
+            className="pause-recording-btn"
+            onClick={
+                isPaused
+                    ? resumeRecording
+                    : pauseRecording
+            }
+        >
+
+            {isPaused ? (
+
+                <Play size={18}/>
+
+            ) : (
+
+                <Pause size={18}/>
+
+            )}
+
+        </button>
+
+        <button
+            className="send-recording-btn"
+            onClick={stopRecording}
+        >
+            <Send size={20}/>
+        </button>
+
+    </div>
+
+    )}
+
+    {showFileMenu && (
+
+        <div
+            className="file-menu"
+            onClick={(e)=>e.stopPropagation()}
+        >
+
+            <label>
+
+                <Image size={20}/>
+
+                <span>Photos & Videos</span>
+
+                <input
+                    hidden
+                    type="file"
+                    accept="image/*,video/*"
+                    onChange={(e)=>
+                        handleFileSelected(
+                            e.target.files[0],
+                            e.target.files[0].type.startsWith("video")
+                                ? "video"
+                                : "image"
+                        )
+                    }
+                />
+
+            </label>
+
+            <label>
+
+                <FileText size={20}/>
+
+                <span>Documents</span>
+
+                <input
+                    hidden
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    onChange={(e)=>
+                        handleFileSelected(
+                            e.target.files[0],
+                            "doc"
+                        )
+                    }
+                />
+
+            </label>
+
+        </div>
+
+    )}
+
+</div>
      
-              {pendingMedia && (
+              {/* {pendingMedia && (
                 <div className="media-preview-modal">
                   <button className="close-btn" onClick={() => setShowDiscardConfirm(true)}><X size={24} /></button>
                   
@@ -694,14 +996,12 @@ useEffect(() => {
                     ) : pendingMedia.type === 'video' ? (
                       <video src={previewUrl} controls />
                     ) : (
-                      /* Document Preview UI */
                       <div className="doc-preview-modal">
                         <FileText size={64} />
                         <p>{pendingMedia.file.name}</p>
                       </div>
                     )}
                     
-                    {/* <input placeholder="Add a caption..." value={caption} onChange={(e) => setCaption(e.target.value)} /> */}
                     <input 
                       placeholder="Add a caption..." 
                       value={caption} 
@@ -725,6 +1025,156 @@ useEffect(() => {
             </div>
           )}
         </div>
+      )} */}
+
+      {pendingMedia && (
+
+      <div
+          className="media-preview-overlay"
+      >
+
+          <button
+              className="media-close-btn"
+              onClick={() => setShowDiscardConfirm(true)}
+          >
+              <X size={26}/>
+          </button>
+
+          <div className="media-preview-container">
+
+              <div className="media-preview-content">
+
+                  {pendingMedia.type === "image" && (
+
+                      <img
+                          src={previewUrl}
+                          alt=""
+                          className="preview-image"
+                      />
+
+                  )}
+
+                  {pendingMedia.type === "video" && (
+
+                      <video
+                          src={previewUrl}
+                          controls
+                          className="preview-video"
+                      />
+
+                  )}
+
+                  {pendingMedia.type === "doc" && (
+
+                      <div className="preview-document">
+
+                          <FileText size={80}/>
+
+                          <h3>
+
+                              {pendingMedia.file.name}
+
+                          </h3>
+
+                          <p>
+
+                              {(pendingMedia.file.size/1024/1024).toFixed(2)} MB
+
+                          </p>
+
+                      </div>
+
+                  )}
+
+              </div>
+
+              <div className="media-bottom">
+
+                  <input
+                      className="caption-input"
+                      placeholder="Add a caption..."
+                      value={caption}
+                      onChange={(e)=>setCaption(e.target.value)}
+                      onKeyDown={(e)=>{
+
+                          if(e.key==="Enter"){
+
+                              finalizeMediaUpload();
+
+                          }
+
+                      }}
+                  />
+
+                  <button
+                      className="send-media-btn"
+                      onClick={finalizeMediaUpload}
+                  >
+
+                      <Send size={22}/>
+
+                  </button>
+
+              </div>
+
+          </div>
+
+          {showDiscardConfirm && (
+
+              <div className="discard-overlay">
+
+                  <div className="discard-modal">
+
+                      <h3>
+
+                          Discard media?
+
+                      </h3>
+
+                      <p>
+
+                          Your selected media and caption will be lost.
+
+                      </p>
+
+                      <div className="discard-actions">
+
+                          <button
+                              className="cancel-discard"
+                              onClick={()=>setShowDiscardConfirm(false)}
+                          >
+
+                              Cancel
+
+                          </button>
+
+                          <button
+                              className="confirm-discard"
+                              onClick={()=>{
+
+                                  setPendingMedia(null);
+
+                                  setCaption("");
+
+                                  setShowDiscardConfirm(false);
+
+                              }}
+                          >
+
+                              Discard
+
+                          </button>
+
+                      </div>
+
+                  </div>
+
+              </div>
+
+          )}
+
+      </div>
+
       )}
     </div>
   );

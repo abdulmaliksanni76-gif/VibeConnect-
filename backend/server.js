@@ -75,14 +75,25 @@ io.on("connection", (socket) => {
 
 socket.on("send_message", async (data) => {
   try {
-    const newMessage = new Message({ 
+    // const newMessage = new Message({ 
+    //     conversationId: data.conversationId,
+    //     sender: data.senderId, 
+    //     text: data.text || "", 
+    //     fileUrl: data.fileUrl,
+    //     fileType: data.fileType || 'text', 
+    //     status: 'sent',
+    //     replyTo: data.replyTo || null // Add this line
+    // });
+
+    const newMessage = new Message({
         conversationId: data.conversationId,
-        sender: data.senderId, 
-        text: data.text || "", 
+        sender: data.senderId,
+        text: data.text || "",
         fileUrl: data.fileUrl,
-        fileType: data.fileType || 'text', 
-        status: 'sent',
-        replyTo: data.replyTo || null // Add this line
+        fileType: data.fileType || "text",
+        fileName: data.fileName || "",
+        status: "sent",
+        replyTo: data.replyTo || null,
     });
     await newMessage.save();
     
@@ -97,9 +108,20 @@ socket.on("send_message", async (data) => {
     });
     
     // Update the populate to include the replied-to message if needed
+    // const populatedMessage = await Message.findById(newMessage._id)
+    //   .populate('sender', 'username')
+    //   .populate('replyTo', 'text fileType'); 
+
     const populatedMessage = await Message.findById(newMessage._id)
-      .populate('sender', 'username')
-      .populate('replyTo', 'text fileType'); // Populates basic info of the replied message
+    .populate("sender","username")
+    .populate({
+        path:"replyTo",
+        select:"text fileType fileUrl fileName sender",
+        populate:{
+            path:"sender",
+            select:"username"
+        }
+    });
       
     io.to(data.conversationId).emit("receive_message", populatedMessage);
     io.emit("refresh_sidebar");
@@ -145,6 +167,22 @@ socket.on("send_message", async (data) => {
       }
     }
     io.emit("get_online_users", Array.from(onlineUsers.keys()));
+  });
+
+  socket.on("recording",(data)=>{
+
+      socket
+          .to(data.conversationId)
+          .emit("recording",data);
+
+  });
+
+  socket.on("stop_recording",(data)=>{
+
+      socket
+          .to(data.conversationId)
+          .emit("stop_recording",data);
+
   });
 });
 

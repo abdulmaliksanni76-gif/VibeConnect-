@@ -81,14 +81,6 @@ function App() {
         <Route path="/success" element={<Success />} />
         <Route path="/login" element={<Login />} />
         
-        {/* 2. Add the new routes as children of ChatLayout to keep the Sidebar */}
-        {/* <Route path="/chat" element={<ChatLayout />}>
-          <Route index element={<div>Select a chat</div>} />
-          <Route path=":conversationId" element={<Chat />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path="profile" element={<Profile />} />
-          <Route path="calls" element={<Calls />} />
-        </Route> */}
         <Route path="/chat" element={<ChatLayout />}>
           {/* Show the logo/welcome screen when at exactly /chat */}
           <Route index element={<ChatWelcome />} />

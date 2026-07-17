@@ -1,0 +1,99 @@
+.vn-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 240px;
+    max-width: 300px;
+}
+
+.vn-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: var(--accent-primary);
+    color: white;
+
+    transition: .25s;
+}
+
+.vn-btn:hover{
+    transform: scale(1.08);
+}
+
+.vn-waveform{
+    display:flex;
+    align-items:flex-end;
+    gap:2px;
+    flex:1;
+    height:28px;
+}
+
+.vn-bar{
+    width:3px;
+    border-radius:20px;
+    background:#7f7669;
+    animation:none;
+}
+
+.vn-bar:nth-child(odd){
+    height:8px;
+}
+
+.vn-bar:nth-child(even){
+    height:16px;
+}
+
+.vn-bar:nth-child(3n){
+    height:24px;
+}
+
+.vn-waveform.playing .vn-bar{
+    animation:wave .7s infinite ease-in-out alternate;
+}
+
+.vn-waveform.playing .vn-bar:nth-child(2){
+    animation-delay:.1s;
+}
+
+.vn-waveform.playing .vn-bar:nth-child(5){
+    animation-delay:.2s;
+}
+
+.vn-waveform.playing .vn-bar:nth-child(7){
+    animation-delay:.3s;
+}
+
+.vn-waveform.playing .vn-bar:nth-child(9){
+    animation-delay:.4s;
+}
+
+.vn-waveform.playing .vn-bar:nth-child(12){
+    animation-delay:.5s;
+}
+
+@keyframes wave{
+
+    from{
+        transform:scaleY(.4);
+    }
+
+    to{
+        transform:scaleY(1.2);
+    }
+
+}
+
+.vn-time{
+    font-size:.75rem;
+    color:#d5d0c8;
+    min-width:40px;
+    text-align:right;
+}

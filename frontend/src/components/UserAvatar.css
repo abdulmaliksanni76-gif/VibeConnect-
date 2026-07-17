@@ -1,0 +1,53 @@
+
+
+.user-info h3{
+
+    margin:0;
+
+    font-size:17px;
+
+    color:white;
+}
+
+.user-info small{
+
+    color:#9CA3AF;
+
+    font-size:12px;
+}
+
+.user-avatar,
+.user-avatar-placeholder{
+
+    border-radius:50%;
+
+    object-fit:cover;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    flex-shrink:0;
+
+    font-weight:700;
+
+    color:white;
+
+    user-select:none;
+
+    border:2px solid rgba(255,255,255,.08);
+
+    box-shadow:
+        0 8px 20px rgba(0,0,0,.30);
+
+    transition:.25s;
+}
+
+.user-avatar:hover,
+.user-avatar-placeholder:hover{
+
+    transform:scale(1.05);
+
+}

@@ -1,0 +1,215 @@
+/* ===========================================
+   VibeConnect Utility Classes
+=========================================== */
+
+
+/* FLEX */
+
+.flex{
+    display:flex;
+}
+
+.flex-column{
+    display:flex;
+    flex-direction:column;
+}
+
+.center{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.flex-between{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.flex-around{
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+}
+
+.flex-evenly{
+    display:flex;
+    justify-content:space-evenly;
+    align-items:center;
+}
+
+.items-center{
+    align-items:center;
+}
+
+.justify-center{
+    justify-content:center;
+}
+
+.justify-between{
+    justify-content:space-between;
+}
+
+.flex-1{
+    flex:1;
+}
+
+
+/* GAP */
+
+.gap-4{
+    gap:4px;
+}
+
+.gap-8{
+    gap:8px;
+}
+
+.gap-12{
+    gap:12px;
+}
+
+.gap-16{
+    gap:16px;
+}
+
+.gap-20{
+    gap:20px;
+}
+
+.gap-24{
+    gap:24px;
+}
+
+
+/* TEXT */
+
+.text-center{
+    text-align:center;
+}
+
+.text-muted{
+    color:var(--text-muted);
+}
+
+.text-secondary{
+    color:var(--text-secondary);
+}
+
+.text-accent{
+    color:var(--accent);
+}
+
+.text-success{
+    color:var(--online);
+}
+
+.text-danger{
+    color:var(--danger);
+}
+
+
+/* BORDER RADIUS */
+
+.rounded-sm{
+    border-radius:var(--radius-sm);
+}
+
+.rounded-md{
+    border-radius:var(--radius-md);
+}
+
+.rounded-lg{
+    border-radius:var(--radius-lg);
+}
+
+.rounded-xl{
+    border-radius:var(--radius-xl);
+}
+
+.rounded-full{
+    border-radius:999px;
+}
+
+
+/* SHADOWS */
+
+.shadow-sm{
+    box-shadow:var(--shadow-sm);
+}
+
+.shadow-md{
+    box-shadow:var(--shadow-md);
+}
+
+.shadow-lg{
+    box-shadow:var(--shadow-lg);
+}
+
+
+/* GLASS */
+
+.glass{
+    background:var(--glass);
+    backdrop-filter:blur(16px);
+    border:1px solid var(--border);
+}
+
+
+/* TRANSITIONS */
+
+.transition{
+    transition:var(--transition);
+}
+
+.pointer{
+    cursor:pointer;
+}
+
+
+/* WIDTH */
+
+.w-full{
+    width:100%;
+}
+
+.h-full{
+    height:100%;
+}
+
+
+/* OVERFLOW */
+
+.overflow-hidden{
+    overflow:hidden;
+}
+
+.overflow-auto{
+    overflow:auto;
+}
+
+
+/* POSITION */
+
+.relative{
+    position:relative;
+}
+
+.absolute{
+    position:absolute;
+}
+
+
+/* ANIMATIONS */
+
+.fade{
+    animation:fadeIn .3s ease;
+}
+
+.scale{
+    animation:scaleIn .25s ease;
+}
+
+.slide{
+    animation:slideUp .3s ease;
+}
