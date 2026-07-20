@@ -783,6 +783,8 @@ const formatTime = (seconds)=>{
           navigate={navigate}
       />
 
+      <div className="chat-content">
+
 <div className="chat-body" onScroll={handleScroll} style={{ position: 'relative', overflowY: 'auto', flex: 1 }}>
       <div className="messages-window">
         {messages.map((m, index) => {
@@ -1147,6 +1149,7 @@ const formatTime = (seconds)=>{
         </button>
 
     </div>
+    
 
     )}
 
@@ -1202,6 +1205,8 @@ const formatTime = (seconds)=>{
         </div>
 
     )}
+
+</div>
 
 </div>
      

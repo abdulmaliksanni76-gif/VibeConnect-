@@ -55,18 +55,29 @@
    CHAT BODY
 ========================================== */
 
-.chat-body{
+/* .chat-body{
 
     flex:1;
 
-    /* overflow-y:auto; */
     overflow: visible;
     overflow-x:hidden;
 
     scroll-behavior:smooth;
 
-    padding:90px 18px 8px;
+    padding:18px 18px 8px;
 
+} */
+
+.chat-body{
+    flex:1;
+
+    overflow-y:auto;
+
+    overflow-x:hidden;
+
+    min-height:0;
+
+    padding:18px 18px 8px;
 }
 
 .chat-body::-webkit-scrollbar{
@@ -80,6 +91,18 @@
 
 .chat-body::-webkit-scrollbar-track{
     background:transparent;
+}
+
+.chat-content{
+    flex:1;
+
+    display:flex;
+
+    flex-direction:column;
+
+    overflow:hidden;
+
+    min-height:0;
 }
 
 
@@ -595,9 +618,22 @@ transform:scale(1);
 
 }
 
-.input-area{
+/* .input-area{
     position:sticky;
     bottom:0;
+
+    padding:16px 22px 20px;
+
+    background:transparent;
+
+    z-index:100;
+} */
+
+.input-area{
+
+    flex-shrink:0;
+
+    position:relative;
 
     padding:16px 22px 20px;
 
