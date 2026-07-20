@@ -152,7 +152,8 @@
 
     .app-main-layout{
 
-        position:fixed;
+        /* position:fixed; */
+        position: relative;
 
         inset:0;
 
@@ -161,6 +162,8 @@
 
         overflow:hidden;
     }
+
+    
 
     .sidebar-container{
 
