@@ -10,6 +10,7 @@ import MessageList from "../components/MessageList";
 import ChatHeader from "../components/ChatHeader";
 import MessageBubble from "../components/MessageBubble";
 import { useLayoutEffect } from "react";
+import imageCompression from "browser-image-compression";
 
 
 const BASE_URL = import.meta.env.VITE_API_URL || "";
@@ -236,13 +237,12 @@ const handleTouchEnd = (e, message) => {
         conversationId,
         text: text || input,
         senderId: userId,
-
         fileUrl: fileData?.fileUrl,
         fileType: fileData?.fileType,
         fileName: fileData?.fileName,
-
         replyTo: replyingTo?._id || null
     });
+
 
     setReplyingTo(null);
     setInput("");
@@ -270,18 +270,111 @@ const deleteMessage = async (messageId) => {
 };
 
 
-  const handleFileUpload = async (file, type) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    const res = await axios.post(`${BASE_URL}/api/chat/upload`, formData, { 
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } 
-    });
+  // const handleFileUpload = async (file, type) => {
+  //   const formData = new FormData();
+  //   formData.append('file', file);
+  //   const res = await axios.post(`${BASE_URL}/api/chat/upload`, formData, { 
+  //     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } 
+  //   });
     
-    const messageText = type === 'audio' ? "" : file.name;
+  //   const messageText = type === 'audio' ? "" : file.name;
     
-    await sendMessage(messageText, { fileUrl: res.data.filePath, fileType: type });
-    setShowFileMenu(false);
-  };
+  //   await sendMessage(messageText, { fileUrl: res.data.filePath, fileType: type });
+  //   setShowFileMenu(false);
+  // };
+
+//   const handleFileUpload = async (file, type) => {
+
+//     try{
+
+//         const formData = new FormData();
+
+//         formData.append("file", file);
+
+//         const res = await axios.post(
+
+//             `${BASE_URL}/api/chat/upload`,
+//             formData,
+
+//             {
+//                 headers:{
+//                     Authorization:`Bearer ${localStorage.getItem("token")}`
+//                 }
+//             }
+
+//         );
+
+//         await sendMessage("",{
+
+//             fileUrl:res.data.filePath,
+
+//             fileType:type,
+
+//             fileName:res.data.fileName
+
+//         });
+
+//         setShowFileMenu(false);
+
+//     }
+
+//     catch(err){
+
+//         console.log(err);
+
+//         alert("Upload failed");
+
+//     }
+
+// };
+
+const handleFileUpload = async (file, type) => {
+    try {
+
+        let uploadFile = file;
+
+        // Compress only images
+        if (type === "image") {
+
+            uploadFile = await imageCompression(file, {
+                maxSizeMB: 0.8,
+                maxWidthOrHeight: 1920,
+                useWebWorker: true,
+            });
+
+        }
+
+        const formData = new FormData();
+        formData.append("file", uploadFile);
+
+        const res = await axios.post(
+            `${BASE_URL}/api/chat/upload`,
+            formData,
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            }
+        );
+
+        console.log("UPLOAD RESPONSE:", res.data);
+
+        await sendMessage("", {
+            fileUrl: res.data.filePath,
+            fileType: type,
+            fileName: file.name // keep the original filename
+        });
+
+        setShowFileMenu(false);
+
+    } catch (err) {
+
+        console.error(err);
+
+        alert("Upload failed");
+
+    }
+};
 
   const handleFileSelected = (file, type) => {
   setPendingMedia({ file, type });
@@ -668,17 +761,25 @@ const formatTime = (seconds)=>{
 
           {fullScreenMedia.type === "image" ? (
             <img
-              src={`${BASE_URL}${fullScreenMedia.url}`}
-              className="fullscreen-content"
-              onClick={(e) => e.stopPropagation()}
+                src={
+                    fullScreenMedia.url.startsWith("http")
+                        ? fullScreenMedia.url
+                        : `${BASE_URL}${fullScreenMedia.url}`
+                }
+                className="fullscreen-content"
+                onClick={(e) => e.stopPropagation()}
             />
           ) : (
             <video
-              src={`${BASE_URL}${fullScreenMedia.url}`}
-              controls
-              autoPlay
-              className="fullscreen-content"
-              onClick={(e) => e.stopPropagation()}
+                src={
+                    fullScreenMedia.url.startsWith("http")
+                        ? fullScreenMedia.url
+                        : `${BASE_URL}${fullScreenMedia.url}`
+                }
+                controls
+                autoPlay
+                className="fullscreen-content"
+                onClick={(e) => e.stopPropagation()}
             />
           )}
         </div>

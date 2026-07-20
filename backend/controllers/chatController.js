@@ -18,10 +18,38 @@ exports.getUserConversations = async (req, res) => {
 };
 
 // New function to handle chat image uploads
-exports.uploadChatImage = [
-    upload.single('image'),
-    async (req, res) => {
-        if (!req.file) return res.status(400).json({ message: "No file uploaded" });
-        res.status(200).json({ imageUrl: req.file.path });
+// exports.uploadChatImage = [
+//     upload.single('image'),
+//     async (req, res) => {
+//         if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+//         res.status(200).json({ imageUrl: req.file.path });
+//     }
+// ];
+
+exports.uploadFile = [
+
+    upload.single("file"),
+
+    async (req,res)=>{
+
+        if(!req.file){
+
+            return res.status(400).json({
+                message:"No file uploaded"
+            });
+
+        }
+
+        res.json({
+
+            filePath:req.file.path,
+
+            fileType:req.file.mimetype,
+
+            fileName:req.file.originalname
+
+        });
+
     }
+
 ];
