@@ -53,6 +53,7 @@ const Chat = () => {
   const discardRecording = useRef(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isRecipientRecording,setIsRecipientRecording] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -269,71 +270,30 @@ const deleteMessage = async (messageId) => {
   }
 };
 
-
-  // const handleFileUpload = async (file, type) => {
-  //   const formData = new FormData();
-  //   formData.append('file', file);
-  //   const res = await axios.post(`${BASE_URL}/api/chat/upload`, formData, { 
-  //     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } 
-  //   });
-    
-  //   const messageText = type === 'audio' ? "" : file.name;
-    
-  //   await sendMessage(messageText, { fileUrl: res.data.filePath, fileType: type });
-  //   setShowFileMenu(false);
-  // };
-
-//   const handleFileUpload = async (file, type) => {
-
-//     try{
-
-//         const formData = new FormData();
-
-//         formData.append("file", file);
-
-//         const res = await axios.post(
-
-//             `${BASE_URL}/api/chat/upload`,
-//             formData,
-
-//             {
-//                 headers:{
-//                     Authorization:`Bearer ${localStorage.getItem("token")}`
-//                 }
-//             }
-
-//         );
-
-//         await sendMessage("",{
-
-//             fileUrl:res.data.filePath,
-
-//             fileType:type,
-
-//             fileName:res.data.fileName
-
-//         });
-
-//         setShowFileMenu(false);
-
-//     }
-
-//     catch(err){
-
-//         console.log(err);
-
-//         alert("Upload failed");
-
-//     }
-
-// };
-
 const handleFileUpload = async (file, type) => {
     try {
 
         let uploadFile = file;
 
-        // Compress only images
+        const tempId = `temp_${Date.now()}`;
+
+        const tempMessage = {
+            _id: tempId,
+            sender: {
+                _id: userId,
+            },
+            text: "",
+            fileUrl: URL.createObjectURL(file),
+            fileType: type,
+            fileName: file.name,
+            createdAt: new Date(),
+            status: "sending",
+            uploading: true,
+            progress: 0,
+        };
+
+        setMessages(prev => [...prev, tempMessage]);
+
         if (type === "image") {
 
             uploadFile = await imageCompression(file, {
@@ -347,23 +307,63 @@ const handleFileUpload = async (file, type) => {
         const formData = new FormData();
         formData.append("file", uploadFile);
 
+        // const res = await axios.post(
+        //     `${BASE_URL}/api/chat/upload`,
+        //     formData,
+        //     {
+        //         headers: {
+        //             Authorization: `Bearer ${localStorage.getItem("token")}`
+        //         }
+        //     }
+        // );
+
         const res = await axios.post(
             `${BASE_URL}/api/chat/upload`,
             formData,
             {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`
+                },
+
+                onUploadProgress: (progressEvent) => {
+
+                    const percent = Math.round(
+                        (progressEvent.loaded * 100) /
+                        progressEvent.total
+                    );
+
+                    setMessages(prev =>
+                        prev.map(msg =>
+                            msg._id === tempId
+                                ? {
+                                      ...msg,
+                                      progress: percent
+                                  }
+                                : msg
+                        )
+                    );
+
                 }
             }
         );
 
         console.log("UPLOAD RESPONSE:", res.data);
 
+        // await sendMessage("", {
+        //     fileUrl: res.data.filePath,
+        //     fileType: type,
+        //     fileName: file.name // keep the original filename
+        // });
+
         await sendMessage("", {
             fileUrl: res.data.filePath,
             fileType: type,
-            fileName: file.name // keep the original filename
+            fileName: file.name
         });
+
+        setMessages(prev =>
+            prev.filter(msg => msg._id !== tempId)
+        );
 
         setShowFileMenu(false);
 
@@ -381,24 +381,127 @@ const handleFileUpload = async (file, type) => {
   setShowFileMenu(false);
 };
 
-const finalizeMediaUpload = async () => {
-  const formData = new FormData();
-  formData.append('file', pendingMedia.file);
+// const finalizeMediaUpload = async () => {
+//   const formData = new FormData();
+//   formData.append('file', pendingMedia.file);
   
-  const res = await axios.post(`${BASE_URL}/api/chat/upload`, formData, { 
-    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } 
-  });
+//   const res = await axios.post(`${BASE_URL}/api/chat/upload`, formData, { 
+//     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } 
+//   });
 
-  console.log("Sending File Name:", pendingMedia.file.name);
+//   console.log("Sending File Name:", pendingMedia.file.name);
   
-  await sendMessage(caption, { 
-    fileUrl: res.data.filePath, 
-    fileType: pendingMedia.type,
-    fileName: pendingMedia.file.name 
-});
+//   await sendMessage(caption, { 
+//     fileUrl: res.data.filePath, 
+//     fileType: pendingMedia.type,
+//     fileName: pendingMedia.file.name 
+// });
   
-  setPendingMedia(null);
-  setCaption("");
+//   setPendingMedia(null);
+//   setCaption("");
+// };
+
+const finalizeMediaUpload = async () => {
+
+    const tempId = Date.now().toString();
+
+    const previewURL = URL.createObjectURL(pendingMedia.file);
+
+    const optimisticMessage = {
+        _id: tempId,
+        sender: { _id: userId },
+        senderId: userId,
+        conversationId,
+
+        text: caption,
+
+        fileType: pendingMedia.type,
+
+        fileUrl: previewURL,
+
+        fileName: pendingMedia.file.name,
+
+        createdAt: new Date(),
+
+        status: "uploading",
+
+        uploadProgress: 0
+    };
+
+    // Show immediately
+    setMessages(prev => [...prev, optimisticMessage]);
+
+    setPendingMedia(null);
+    setCaption("");
+
+    const formData = new FormData();
+    formData.append("file", pendingMedia.file);
+
+    try {
+
+        const res = await axios.post(
+
+            `${BASE_URL}/api/chat/upload`,
+
+            formData,
+
+            {
+
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                },
+
+                onUploadProgress: (progressEvent) => {
+
+                    const percent = Math.round(
+                        progressEvent.loaded * 100 /
+                        progressEvent.total
+                    );
+
+                    setUploadProgress(percent);
+
+                    setMessages(prev =>
+                        prev.map(msg =>
+                            msg._id === tempId
+                                ? {
+                                      ...msg,
+                                      uploadProgress: percent
+                                  }
+                                : msg
+                        )
+                    );
+                }
+
+            }
+
+        );
+
+        // remove fake message
+        setMessages(prev =>
+            prev.filter(msg => msg._id !== tempId)
+        );
+
+        await sendMessage(caption, {
+
+            fileUrl: res.data.filePath,
+
+            fileType: pendingMedia.type,
+
+            fileName: pendingMedia.file.name
+
+        });
+
+    }
+
+    catch (err) {
+
+        setMessages(prev =>
+            prev.filter(msg => msg._id !== tempId)
+        );
+
+        alert("Upload failed");
+    }
+
 };
 
 const scrollToMessage = (msgId) => {

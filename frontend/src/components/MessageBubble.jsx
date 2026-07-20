@@ -121,6 +121,16 @@ const MessageBubble = ({
                         />
                     )}
 
+                    {message.status === "uploading" && (
+
+                        <div className="upload-progress">
+
+                            Uploading {message.uploadProgress || 0}%
+
+                        </div>
+
+                    )}
+
                     {/* VIDEO */}
 
                     {message.fileType === "video" && (
