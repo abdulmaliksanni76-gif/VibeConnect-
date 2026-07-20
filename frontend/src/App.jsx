@@ -13,8 +13,10 @@ import Profile from './pages/Profile';
 import Calls from './pages/Calls';
 import ChatWelcome from './components/ChatWelcome';
 import { UserProvider } from './context/UserContext';
+import useViewportHeight from "./hooks/useViewportHeight";
 
 function App() {
+  useViewportHeight();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

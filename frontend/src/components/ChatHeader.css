@@ -174,7 +174,9 @@
 } */
 
 .chat-header{
-    position: sticky;
+    position:relative;
+
+    flex-shrink:0;
     top: 0;
 
     width: 100%;
