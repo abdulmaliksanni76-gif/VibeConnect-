@@ -3,6 +3,16 @@
 ========================================== */
 
 .chat-app-container{
+    /* position:relative;
+
+    display:flex;
+    flex-direction:column;
+
+    width:100%;
+    height:100%;
+    height: 100dvh;
+
+    overflow:hidden; */
     position:relative;
 
     display:flex;
@@ -11,7 +21,10 @@
     width:100%;
     height:100%;
 
-    overflow:hidden;
+    overflow-y:auto;
+    overflow-x:hidden;
+
+    -webkit-overflow-scrolling:touch;
 
     background:
         linear-gradient(
@@ -46,12 +59,13 @@
 
     flex:1;
 
-    overflow-y:auto;
+    /* overflow-y:auto; */
+    overflow: visible;
     overflow-x:hidden;
 
     scroll-behavior:smooth;
 
-    padding:18px 18px 8px;
+    padding:90px 18px 8px;
 
 }
 
@@ -585,8 +599,7 @@ transform:scale(1);
     position:sticky;
     bottom:0;
 
-    /* padding:16px 22px 20px; */
-    padding:12px 18px calc(env(safe-area-inset-bottom) + 8px);
+    padding:16px 22px 20px;
 
     background:transparent;
 
