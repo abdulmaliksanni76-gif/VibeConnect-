@@ -152,8 +152,7 @@
 
     .app-main-layout{
 
-        /* position:fixed; */
-        position: relative;
+        position:fixed;
 
         inset:0;
 
