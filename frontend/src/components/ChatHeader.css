@@ -482,17 +482,6 @@
         overflow:hidden;
     }
 
-    /* Smaller avatar */
-    /* .chat-header-avatar{
-        width:40px;
-        height:40px;
-
-        min-width:40px;
-        min-height:40px;
-
-        border-width:1.5px;
-    } */
-
     .chat-header-avatar{
         width:36px;
         height:36px;
@@ -523,11 +512,12 @@
         text-overflow:ellipsis;
     }
 
-    /* Status / typing text */
     .user-info small{
-        margin-top:1px;
+        margin-top:5px;
 
-        font-size:10px;
+        font-size:13px;
+
+        line-height:15px;
 
         white-space:nowrap;
         overflow:hidden;
@@ -539,6 +529,7 @@
         height:6px;
 
         flex-shrink:0;
+        margin-top: 3px;
     }
 
     /* Three round action buttons */
