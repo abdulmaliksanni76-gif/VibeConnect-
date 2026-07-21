@@ -21,7 +21,7 @@ const ChatHeader = ({
 
   return (
 
-    <div className="chat-header">
+<div className="chat-header">
   <button className="back-btn" onClick={() => navigate("/chat")}>
     <ArrowLeft size={22} />
   </button>
@@ -37,28 +37,6 @@ const ChatHeader = ({
     <div className="user-info">
       <h3>{recipient?.username || "Chat"}</h3>
 
-      {/* {isRecipientTyping ? (
-        <small className="typing-indicator">
-          <span className="typing-dot"></span>
-          <span className="typing-dot"></span>
-          <span className="typing-dot"></span>
-          typing...
-        </small>
-      ) : (
-        <small className="user-status">
-          <span
-            className={`status-dot ${
-              onlineUsers.includes(recipient?._id)
-                ? "online"
-                : "offline"
-            }`}
-          ></span>
-
-          {onlineUsers.includes(recipient?._id)
-            ? "Online"
-            : "Offline"}
-        </small>
-      )} */}
       {isRecipientRecording ? (
 
           <small className="recording-indicator">
