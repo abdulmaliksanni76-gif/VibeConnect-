@@ -10,6 +10,9 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
+const User = require('./models/User');
+const { sendPushNotification } = require('./utils/pushNotification');
 const path = require('path');
 
 const app = express();
@@ -41,46 +44,222 @@ io.on("connection", (socket) => {
     console.log(`User joined room: ${conversationId}`);
   });
 
+// socket.on("send_message", async (data) => {
+//   console.log("SOCKET DATA:", data);
+//   try {
+
+//     const newMessage = new Message({
+//         conversationId: data.conversationId,
+//         sender: data.senderId,
+//         text: data.text || "",
+//         fileUrl: data.fileUrl,
+//         fileType: data.fileType || "text",
+//         fileName: data.fileName || "",
+//         status: "sent",
+//         replyTo: data.replyTo || null,
+//     });
+//     await newMessage.save();
+    
+//     let previewText = data.text;
+//     if (data.fileType === 'audio') previewText = "Voice note";
+//     else if (data.fileType === 'image') previewText = "Image";
+//     else if (data.fileUrl) previewText = "File"; 
+    
+//     await Conversation.findByIdAndUpdate(data.conversationId, {
+//         lastMessage: previewText,
+//         updatedAt: new Date()
+//     });
+
+//     const populatedMessage = await Message.findById(newMessage._id)
+//     .populate("sender","username")
+//     .populate({
+//         path:"replyTo",
+//         select:"text fileType fileUrl fileName sender",
+//         populate:{
+//             path:"sender",
+//             select:"username"
+//         }
+//     });
+      
+//     io.to(data.conversationId).emit("receive_message", populatedMessage);
+//     io.emit("refresh_sidebar");
+//   } catch (err) { console.error("Send Error:", err); }
+// });
+
+
 socket.on("send_message", async (data) => {
   console.log("SOCKET DATA:", data);
+
   try {
+    // ==========================================
+    // 1. SAVE THE MESSAGE
+    // ==========================================
 
     const newMessage = new Message({
-        conversationId: data.conversationId,
-        sender: data.senderId,
-        text: data.text || "",
-        fileUrl: data.fileUrl,
-        fileType: data.fileType || "text",
-        fileName: data.fileName || "",
-        status: "sent",
-        replyTo: data.replyTo || null,
-    });
-    await newMessage.save();
-    
-    let previewText = data.text;
-    if (data.fileType === 'audio') previewText = "Voice note";
-    else if (data.fileType === 'image') previewText = "Image";
-    else if (data.fileUrl) previewText = "File"; 
-    
-    await Conversation.findByIdAndUpdate(data.conversationId, {
-        lastMessage: previewText,
-        updatedAt: new Date()
+      conversationId: data.conversationId,
+      sender: data.senderId,
+      text: data.text || "",
+      fileUrl: data.fileUrl,
+      fileType: data.fileType || "text",
+      fileName: data.fileName || "",
+      status: "sent",
+      replyTo: data.replyTo || null,
     });
 
-    const populatedMessage = await Message.findById(newMessage._id)
-    .populate("sender","username")
-    .populate({
-        path:"replyTo",
-        select:"text fileType fileUrl fileName sender",
-        populate:{
-            path:"sender",
-            select:"username"
+    await newMessage.save();
+
+
+    // ==========================================
+    // 2. UPDATE CONVERSATION
+    // ==========================================
+
+    let previewText = data.text || "";
+
+    if (data.fileType === "audio") {
+      previewText = "Voice note";
+    } else if (data.fileType === "image") {
+      previewText = "Image";
+    } else if (data.fileUrl) {
+      previewText = "File";
+    } else if (previewText.length > 30) {
+      previewText = previewText.substring(0, 30) + "...";
+    }
+
+    const conversation = await Conversation.findByIdAndUpdate(
+      data.conversationId,
+      {
+        lastMessage: previewText,
+        updatedAt: new Date()
+      },
+      {
+        new: true
+      }
+    );
+
+
+    // ==========================================
+    // 3. POPULATE THE MESSAGE
+    // ==========================================
+
+    const populatedMessage = await Message.findById(
+      newMessage._id
+    )
+      .populate("sender", "username")
+      .populate({
+        path: "replyTo",
+        select: "text fileType fileUrl fileName sender",
+        populate: {
+          path: "sender",
+          select: "username"
         }
-    });
-      
-    io.to(data.conversationId).emit("receive_message", populatedMessage);
+      });
+
+
+    // ==========================================
+    // 4. SEND MESSAGE TO CHAT IN REAL TIME
+    // ==========================================
+
+    io.to(data.conversationId).emit(
+      "receive_message",
+      populatedMessage
+    );
+
+
+    // ==========================================
+    // 5. REFRESH SIDEBAR
+    // ==========================================
+
     io.emit("refresh_sidebar");
-  } catch (err) { console.error("Send Error:", err); }
+
+
+    // ==========================================
+    // 6. FIND THE RECIPIENT
+    // ==========================================
+
+    if (conversation) {
+
+      const recipientId = conversation.participants.find(
+        participant =>
+          participant.toString() !== data.senderId.toString()
+      );
+
+
+      // ==========================================
+      // 7. GET RECIPIENT'S PUSH SUBSCRIPTION
+      // ==========================================
+
+      if (recipientId) {
+
+        const recipient = await User.findById(
+          recipientId
+        ).select(
+          "username pushSubscription"
+        );
+
+
+        // ==========================================
+        // 8. SEND PUSH NOTIFICATION
+        // ==========================================
+
+        if (
+          recipient &&
+          recipient.pushSubscription &&
+          recipient.pushSubscription.endpoint
+        ) {
+
+          let notificationBody = data.text || "";
+
+          if (data.fileType === "audio") {
+            notificationBody = "🎤 Voice note";
+          } else if (data.fileType === "image") {
+            notificationBody = "📷 Image";
+          } else if (data.fileUrl) {
+            notificationBody = "📄 File";
+          }
+
+          if (notificationBody.length > 100) {
+            notificationBody =
+              notificationBody.substring(0, 100) + "...";
+          }
+
+
+          await sendPushNotification(
+            recipient.pushSubscription,
+            {
+              title: recipient.username
+                ? `${populatedMessage.sender.username}`
+                : "VibeConnect",
+
+              body: notificationBody,
+
+              icon: "/favicon.ico",
+
+              badge: "/favicon.ico",
+
+              url: `/chat/${data.conversationId}`
+            }
+          );
+
+        } else {
+
+          console.log(
+            "⚠️ Recipient has no push subscription"
+          );
+
+        }
+
+      }
+
+    }
+
+  } catch (err) {
+
+    console.error(
+      "❌ Send Error:",
+      err
+    );
+
+  }
 });
 
   // Typing logic
@@ -145,6 +324,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/chat', uploadRoutes);
+app.use('/api/notifications', notificationRoutes);
 // app.use('/uploads', express.static('uploads'));
 
 if (process.env.NODE_ENV === 'production') {
