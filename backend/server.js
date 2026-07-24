@@ -226,8 +226,8 @@ socket.on("send_message", async (data) => {
           await sendPushNotification(
             recipient.pushSubscription,
             {
-              title: recipient.username
-                ? `${populatedMessage.sender.username}`
+              title: populatedMessage.sender.username
+                ? populatedMessage.sender.username
                 : "VibeConnect",
 
               body: notificationBody,
@@ -236,7 +236,6 @@ socket.on("send_message", async (data) => {
 
               badge: "/favicon.ico",
 
-              // url: `/chat/${data.conversationId}`
               url: `/chat/${data.conversationId}?messageId=${newMessage._id}`
             }
           );
