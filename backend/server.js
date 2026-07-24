@@ -236,7 +236,8 @@ socket.on("send_message", async (data) => {
 
               badge: "/favicon.ico",
 
-              url: `/chat/${data.conversationId}`
+              // url: `/chat/${data.conversationId}`
+              url: `/chat/${data.conversationId}?messageId=${newMessage._id}`
             }
           );
 
