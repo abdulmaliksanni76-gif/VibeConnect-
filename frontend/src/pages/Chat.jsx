@@ -348,13 +348,6 @@ const handleFileUpload = async (file, type) => {
         );
 
         console.log("UPLOAD RESPONSE:", res.data);
-
-        // await sendMessage("", {
-        //     fileUrl: res.data.filePath,
-        //     fileType: type,
-        //     fileName: file.name // keep the original filename
-        // });
-
         await sendMessage("", {
             fileUrl: res.data.filePath,
             fileType: type,
@@ -381,25 +374,6 @@ const handleFileUpload = async (file, type) => {
   setShowFileMenu(false);
 };
 
-// const finalizeMediaUpload = async () => {
-//   const formData = new FormData();
-//   formData.append('file', pendingMedia.file);
-  
-//   const res = await axios.post(`${BASE_URL}/api/chat/upload`, formData, { 
-//     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } 
-//   });
-
-//   console.log("Sending File Name:", pendingMedia.file.name);
-  
-//   await sendMessage(caption, { 
-//     fileUrl: res.data.filePath, 
-//     fileType: pendingMedia.type,
-//     fileName: pendingMedia.file.name 
-// });
-  
-//   setPendingMedia(null);
-//   setCaption("");
-// };
 
 const finalizeMediaUpload = async () => {
 
@@ -1209,47 +1183,6 @@ const formatTime = (seconds)=>{
 </div>
 
 </div>
-     
-              {/* {pendingMedia && (
-                <div className="media-preview-modal">
-                  <button className="close-btn" onClick={() => setShowDiscardConfirm(true)}><X size={24} /></button>
-                  
-                  <div className="modal-content">
-                    {pendingMedia.type === 'image' ? (
-                      <img src={previewUrl} alt="preview" />
-                    ) : pendingMedia.type === 'video' ? (
-                      <video src={previewUrl} controls />
-                    ) : (
-                      <div className="doc-preview-modal">
-                        <FileText size={64} />
-                        <p>{pendingMedia.file.name}</p>
-                      </div>
-                    )}
-                    
-                    <input 
-                      placeholder="Add a caption..." 
-                      value={caption} 
-                      onChange={(e) => setCaption(e.target.value)} 
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          finalizeMediaUpload();
-                        }
-                      }}
-                    />
-                    <button className="send-media-btn" onClick={finalizeMediaUpload}>Send</button>
-                  </div>
-
-          {showDiscardConfirm && (
-            <div className="confirm-modal">
-              <h3>Discard selection?</h3>
-              <div className="confirm-actions">
-                <button className="cancel-btn" onClick={() => setShowDiscardConfirm(false)}>Cancel</button>
-                <button className="discard-btn" onClick={() => { setPendingMedia(null); setCaption(""); setShowDiscardConfirm(false); }}>Discard</button>
-              </div>
-            </div>
-          )}
-        </div>
-      )} */}
 
       {pendingMedia && (
 
