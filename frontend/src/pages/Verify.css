@@ -1,0 +1,555 @@
+/* =========================
+   VERIFY PAGE
+========================= */
+
+.verify-page {
+  position: relative;
+  width: 100%;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px;
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      180deg,
+      #17110e 0%,
+      #0d0908 55%,
+      #070505 100%
+    );
+
+  color: #f6f1ec;
+}
+
+
+/* =========================
+   BACKGROUND
+========================= */
+
+.verify-glow {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(100px);
+}
+
+.verify-glow-one {
+  width: 330px;
+  height: 330px;
+  top: -180px;
+  left: -140px;
+  background: rgba(122, 90, 248, 0.14);
+}
+
+.verify-glow-two {
+  width: 300px;
+  height: 300px;
+  right: -160px;
+  bottom: -170px;
+  background: rgba(213, 183, 138, 0.09);
+}
+
+.verify-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.025;
+
+  background-image:
+    linear-gradient(
+      rgba(255, 255, 255, 1) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 1) 1px,
+      transparent 1px
+    );
+
+  background-size: 42px 42px;
+}
+
+
+/* =========================
+   CARD
+========================= */
+
+.verify-card {
+  position: relative;
+  z-index: 2;
+
+  width: 100%;
+  max-width: 440px;
+
+  padding: 34px 36px;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.08);
+
+  border-radius: 26px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.055),
+      rgba(255, 255, 255, 0.018)
+    );
+
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.38);
+
+  animation:
+    verifyCardIn 0.6s
+    cubic-bezier(0.22, 1, 0.36, 1)
+    forwards;
+}
+
+@keyframes verifyCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+/* =========================
+   BRAND
+========================= */
+
+.verify-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-bottom: 26px;
+
+  color: #f6f1ec;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.verify-brand-icon {
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 13px;
+
+  color: #f6f1ec;
+
+  background:
+    linear-gradient(
+      135deg,
+      #d5b78a,
+      #9f7651
+    );
+
+  box-shadow:
+    0 10px 25px rgba(213, 183, 138, 0.15);
+}
+
+
+/* =========================
+   HEADING
+========================= */
+
+.verify-heading {
+  text-align: center;
+  margin-bottom: 26px;
+}
+
+.verify-label {
+  margin-bottom: 9px;
+
+  color: #d5b78a;
+
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.verify-heading h1 {
+  margin: 0;
+
+  color: #f6f1ec;
+
+  font-size: clamp(1.7rem, 5vw, 2.1rem);
+  font-weight: 750;
+
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+}
+
+.verify-description {
+  margin: 12px auto 0;
+
+  max-width: 340px;
+
+  color: #a99d94;
+
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.verify-email {
+  color: #d5b78a;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+
+/* =========================
+   STATUS MESSAGE
+========================= */
+
+.verify-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+
+  margin-bottom: 20px;
+  padding: 12px 14px;
+
+  border-radius: 13px;
+
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.verify-message p {
+  margin: 0;
+}
+
+.verify-message.error {
+  border:
+    1px solid rgba(255, 107, 107, 0.18);
+
+  background:
+    rgba(255, 107, 107, 0.07);
+
+  color: #ffb3b3;
+}
+
+.verify-message.success {
+  border:
+    1px solid rgba(95, 211, 151, 0.16);
+
+  background:
+    rgba(95, 211, 151, 0.07);
+
+  color: #a8f0c6;
+}
+
+
+/* =========================
+   OTP INPUTS
+========================= */
+
+.verify-otp-container {
+  display: flex;
+  justify-content: center;
+  gap: 9px;
+
+  margin-bottom: 24px;
+}
+
+.verify-otp-input {
+  width: 48px;
+  height: 56px;
+
+  flex-shrink: 1;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.09);
+
+  border-radius: 14px;
+
+  outline: none;
+
+  background:
+    rgba(255, 255, 255, 0.035);
+
+  color: #f6f1ec;
+
+  text-align: center;
+
+  font-size: 1.35rem;
+  font-weight: 700;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.verify-otp-input:hover {
+  border-color:
+    rgba(213, 183, 138, 0.3);
+}
+
+.verify-otp-input:focus {
+  border-color:
+    rgba(213, 183, 138, 0.7);
+
+  background:
+    rgba(255, 255, 255, 0.055);
+
+  box-shadow:
+    0 0 0 4px rgba(213, 183, 138, 0.08);
+
+  transform: translateY(-1px);
+}
+
+
+/* =========================
+   VERIFY BUTTON
+========================= */
+
+.verify-submit-btn {
+  width: 100%;
+  min-height: 52px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  border: none;
+  border-radius: 15px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #d5b78a,
+      #aa7e58
+    );
+
+  color: #17110e;
+
+  font-size: 0.92rem;
+  font-weight: 750;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 12px 28px rgba(170, 126, 88, 0.2);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.verify-submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 16px 34px rgba(170, 126, 88, 0.3);
+}
+
+.verify-submit-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.verify-submit-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+
+/* =========================
+   SPINNER
+========================= */
+
+.verify-spinner {
+  width: 17px;
+  height: 17px;
+
+  border:
+    2px solid rgba(23, 17, 14, 0.25);
+
+  border-top-color: #17110e;
+
+  border-radius: 50%;
+
+  animation:
+    verifySpin 0.7s linear infinite;
+}
+
+@keyframes verifySpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* =========================
+   RESEND
+========================= */
+
+.verify-resend-text {
+  margin: 22px 0 0;
+
+  color: #8f837a;
+
+  text-align: center;
+
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.verify-resend-btn {
+  margin-left: 5px;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: #d5b78a;
+
+  font: inherit;
+  font-weight: 650;
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.verify-resend-btn:hover:not(:disabled) {
+  color: #f0d3a5;
+}
+
+.verify-resend-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 520px) {
+
+  .verify-page {
+    padding:
+      max(18px, env(safe-area-inset-top))
+      14px
+      max(18px, env(safe-area-inset-bottom));
+  }
+
+  .verify-card {
+    max-width: 380px;
+    padding: 27px 18px;
+    border-radius: 22px;
+  }
+
+  .verify-brand {
+    margin-bottom: 23px;
+  }
+
+  .verify-brand-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  .verify-heading {
+    margin-bottom: 22px;
+  }
+
+  .verify-description {
+    font-size: 0.84rem;
+  }
+
+  .verify-otp-container {
+    gap: 7px;
+    margin-bottom: 21px;
+  }
+
+  .verify-otp-input {
+    width: min(13vw, 46px);
+    height: 52px;
+    border-radius: 12px;
+    font-size: 1.2rem;
+  }
+
+  .verify-submit-btn {
+    min-height: 50px;
+    border-radius: 14px;
+  }
+
+  .verify-resend-text {
+    margin-top: 18px;
+  }
+
+}
+
+
+@media (max-width: 360px) {
+
+  .verify-page {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .verify-card {
+    padding: 23px 14px;
+  }
+
+  .verify-brand {
+    margin-bottom: 19px;
+  }
+
+  .verify-heading h1 {
+    font-size: 1.55rem;
+  }
+
+  .verify-otp-container {
+    gap: 5px;
+  }
+
+  .verify-otp-input {
+    width: 42px;
+    height: 48px;
+    font-size: 1.1rem;
+  }
+
+}
+
+
+/* =========================
+   REDUCED MOTION
+========================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .verify-card,
+  .verify-spinner {
+    animation: none;
+  }
+
+  .verify-submit-btn,
+  .verify-otp-input {
+    transition: none;
+  }
+
+}
