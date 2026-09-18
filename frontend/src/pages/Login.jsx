@@ -201,7 +201,7 @@ function Login() {
             className="login-error"
             role="alert"
           >
-            <span className="login-error-dot" />
+            {/* <span className="login-error-dot" /> */}
 
             <p>{error}</p>
           </div>
